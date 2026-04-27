@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #ED1C24; /* Pure intense red */
+  --color-brand-surface: #ffffff; /* White surface */
+  --color-brand-card: #ffffff;
+  --color-brand-dark: #000000; /* Pure black */
+  --color-brand-muted: #4a4a4a; /* Dark grey for text */
+  --color-brand-border: #e5e5e5; /* Light grey for borders */
+  
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-surface text-slate-800 font-body antialiased;
+  }
+}
+
+.scout-gradient {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.85)), url('https://images.unsplash.com/photo-1544391219-09419106093f?q=80&w=2072&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+.sleek-bg {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  position: relative;
+  overflow: hidden;
+}
+
+.sleek-bg::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(237, 28, 36, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
