@@ -123,11 +123,11 @@ export default function Admin() {
         </section>
 
         {/* Schedule Section */}
-        <section className="bg-white p-10 rounded-[40px] border border-slate-200 shadow-xl">
+        <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 italic text-brand-primary">Jadwal Kegiatan</h2>
           <div className="space-y-8">
             {data.schedule.map((day: any, dIdx: number) => (
-              <div key={dIdx} className="border-t border-slate-100 pt-8 first:border-0 first:pt-0">
+              <div key={dIdx} className="border-t border-brand-border/10 pt-8 first:border-0 first:pt-0">
                 <div className="flex justify-between items-center mb-6">
                    <div className="flex gap-4 items-center">
                     <input
@@ -140,7 +140,7 @@ export default function Admin() {
                       }}
                     />
                     <input
-                      className="text-sm font-bold text-slate-400 uppercase tracking-widest"
+                      className="text-sm font-bold text-brand-muted uppercase tracking-widest"
                       value={day.date}
                       onChange={(e) => {
                         const newSchedule = [...data.schedule];
@@ -152,7 +152,7 @@ export default function Admin() {
                 </div>
                 <div className="space-y-4">
                   {day.events.map((event: any, eIdx: number) => (
-                    <div key={eIdx} className="flex gap-4 items-center bg-slate-50 p-4 rounded-2xl">
+                    <div key={eIdx} className="flex gap-4 items-center bg-brand-surface p-4 rounded-2xl">
                       <input
                         className="w-32 bg-transparent text-xs font-mono font-bold text-brand-primary"
                         value={event.time}
@@ -163,7 +163,7 @@ export default function Admin() {
                         }}
                       />
                       <input
-                        className="flex-1 bg-transparent font-bold text-slate-800"
+                        className="flex-1 bg-transparent font-bold text-brand-dark"
                         value={event.name}
                         onChange={(e) => {
                           const newSchedule = [...data.schedule];
@@ -177,7 +177,7 @@ export default function Admin() {
                           newSchedule[dIdx].events.splice(eIdx, 1);
                           setData({ ...data, schedule: newSchedule });
                         }}
-                        className="p-2 text-slate-300 hover:text-brand-primary transition-colors"
+                        className="p-2 text-brand-muted/30 hover:text-brand-primary transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -189,7 +189,7 @@ export default function Admin() {
                       newSchedule[dIdx].events.push({ time: "00:00 - 00:00", name: "Acara Baru", location: "Lokasi" });
                       setData({ ...data, schedule: newSchedule });
                     }}
-                    className="w-full p-4 border border-dashed border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
+                    className="w-full p-4 border border-dashed border-brand-border rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
                   >
                     <Plus className="w-3 h-3" />
                     Tambah Acara
@@ -201,26 +201,26 @@ export default function Admin() {
         </section>
 
         {/* Recap Section */}
-        <section className="bg-white p-6 md:p-10 rounded-[40px] border border-slate-200 shadow-xl overflow-hidden">
+        <section className="bg-white p-6 md:p-10 rounded-[40px] border border-brand-border shadow-xl overflow-hidden">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 italic text-brand-primary">Pengaturan Skor & Rekapitulasi</h2>
           <div className="overflow-x-auto -mx-6 px-6">
             <table className="w-full text-left border-collapse min-w-[2000px]">
               <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">No</th>
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 min-w-[200px]">Nama Regu</th>
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">No Tenda</th>
+                <tr className="border-b border-brand-border/10">
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted">No</th>
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted min-w-[200px]">Nama Regu</th>
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted">No Tenda</th>
                   {Array.from({ length: 20 }).map((_, i) => (
-                    <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Lomba {i + 1}</th>
+                    <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center">Lomba {i + 1}</th>
                   ))}
                   <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right">Total</th>
                   <th className="py-4 px-4 text-right"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-brand-surface">
                 {data.recap.map((item: any, i: number) => (
-                  <tr key={i} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="py-4 px-4 font-black text-slate-300">{i + 1}</td>
+                  <tr key={i} className="hover:bg-brand-surface/50 transition-colors group">
+                    <td className="py-4 px-4 font-black text-brand-muted/30">{i + 1}</td>
                     <td className="py-4 px-4">
                       <input
                         className="w-full bg-transparent font-black uppercase tracking-tight"
@@ -247,7 +247,7 @@ export default function Admin() {
                       <td key={sIdx} className="py-4 px-1">
                         <input
                           type="number"
-                          className="w-16 bg-white border border-slate-100 p-2 rounded-lg text-center font-bold text-xs focus:border-brand-primary outline-none transition-colors"
+                          className="w-16 bg-white border border-brand-border/10 p-2 rounded-lg text-center font-bold text-xs focus:border-brand-primary outline-none transition-colors"
                           value={item.scores[sIdx] || 0}
                           onChange={(e) => {
                             const newRecap = [...data.recap];
@@ -293,7 +293,7 @@ export default function Admin() {
                 }] 
               });
             }}
-            className="mt-8 w-full p-6 border border-dashed border-slate-200 rounded-3xl text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
+            className="mt-8 w-full p-6 border border-dashed border-brand-border rounded-3xl text-[10px] font-black uppercase tracking-[0.3em] text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Tambah Baris Regu
@@ -301,7 +301,7 @@ export default function Admin() {
         </section>
       </main>
       
-      <footer className="p-10 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 border-t border-slate-200 bg-white">
+      <footer className="p-10 text-center text-[10px] font-black uppercase tracking-widest text-brand-muted border-t border-brand-border bg-white">
         Admin Panel © 2026 Kwarran Jatinagara
       </footer>
     </div>

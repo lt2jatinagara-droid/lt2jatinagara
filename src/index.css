@@ -14,7 +14,7 @@
 
 @layer base {
   body {
-    @apply bg-brand-surface text-slate-800 font-body antialiased;
+    @apply bg-brand-surface text-brand-dark font-body antialiased;
   }
 }
 

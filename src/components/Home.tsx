@@ -41,7 +41,7 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (loading || !siteData) return <div className="min-h-screen flex items-center justify-center font-bold uppercase tracking-widest text-slate-400">Loading...</div>;
+  if (loading || !siteData) return <div className="min-h-screen bg-brand-surface flex items-center justify-center font-bold uppercase tracking-widest text-brand-muted">Loading...</div>;
 
   const { schedule, recap, settings } = siteData;
 
@@ -67,7 +67,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">P</div>
             <div>
-              <h1 className={`text-sm font-black uppercase tracking-tighter leading-none ${scrolled ? "text-slate-900" : "text-white"}`}>
+              <h1 className={`text-sm font-black uppercase tracking-tighter leading-none ${scrolled ? "text-brand-dark" : "text-white"}`}>
                 LT 2 KWARRAN
               </h1>
               <p className={`text-[10px] font-semibold tracking-widest uppercase leading-none mt-1 ${scrolled ? "text-brand-primary" : "text-brand-primary"}`}>
@@ -89,8 +89,8 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/admin" className={`hidden md:block text-[10px] font-bold px-5 py-2.5 rounded-full uppercase tracking-widest transition-all ${scrolled ? "bg-brand-dark text-white hover:bg-brand-primary shadow-sm" : "bg-white/10 text-white hover:bg-brand-primary hover:text-white backdrop-blur-md"}`}>
-              Admin
+            <Link to="/admin" className={`hidden md:block text-[10px] font-black px-6 py-3 rounded-full uppercase tracking-widest transition-all shadow-xl hover:scale-105 active:scale-95 ${scrolled ? "bg-brand-primary text-white hover:bg-brand-dark" : "bg-brand-primary text-white hover:bg-white hover:text-brand-primary"}`}>
+              Admin Panel
             </Link>
             <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className={scrolled ? "text-brand-dark" : "text-white"} /> : <Menu className={scrolled ? "text-brand-dark" : "text-white"} />}
@@ -112,12 +112,14 @@ export default function Home() {
                   key={item} 
                   href={`#${item.toLowerCase()}`}
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-sm font-bold uppercase tracking-widest border-b border-gray-100 pb-2 text-slate-600"
+                  className="text-sm font-bold uppercase tracking-widest border-b border-brand-border pb-2 text-brand-muted"
                 >
                   {item}
                 </a>
               ))}
-              <Link to="/admin" className="text-sm font-bold uppercase tracking-widest text-brand-primary pt-2">Admin Panel</Link>
+              <Link to="/admin" className="mt-4 w-full text-center bg-brand-primary text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-lg">
+                Masuk Panel Admin
+              </Link>
             </motion.div>
           )}
         </AnimatePresence>
@@ -134,11 +136,11 @@ export default function Home() {
           <div className="inline-block bg-brand-primary text-white text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-8 italic shadow-xl">
             Menuju Kemandirian & Karakter Bangsa
           </div>
-          <h1 className="text-7xl md:text-9xl font-black mb-8 leading-[0.85] tracking-tighter">
+          <h1 className="text-2xl md:text-4xl font-black mb-8 leading-tight tracking-tighter">
             LOMBA<br />
             <span className="text-brand-primary">TINGKAT II</span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-300 mb-12 max-w-xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-white/80 mb-12 max-w-xl mx-auto leading-relaxed">
             Ajang kompetisi pramuka penggalang tingkat Kwartir Ranting Jatinagara. Persiapkan regu terbaikmu untuk menuju LT 3 Kabupaten Ciamis.
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
