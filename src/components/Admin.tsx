@@ -24,12 +24,18 @@ export default function Admin() {
   const [isUsingFirebase, setIsUsingFirebase] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    // If Firebase is not configured, immediately fall back to local API to avoid infinite loading
+    if (!auth || !auth.onAuthStateChanged) {
+      console.warn("Firebase Auth not detected, falling back to local mode.");
+      loadFromLocalApi();
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (u: any) => {
       setUser(u);
       if (u) {
         setIsLoggedIn(true);
         setIsUsingFirebase(true);
-        // Sync with Firestore
         loadFromFirestore();
       } else {
         loadFromLocalApi();
@@ -146,43 +152,45 @@ export default function Admin() {
           </div>
           <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 italic">Admin Portal</h2>
           <p className="text-xs text-brand-muted font-bold uppercase tracking-widest mb-10 leading-relaxed italic">
-            Pilih metode masuk untuk mengelola data LT 2 Kwarran Jatinagara
+            Masukkan password keamanan untuk mengelola data LT 2 Kwarran Jatinagara
           </p>
 
-          <button
-            onClick={handleLogin}
-            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 mb-6 shadow-xl active:scale-95"
-          >
-            Google Login (Terverifikasi)
-          </button>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-border"></div></div>
-            <div className="relative text-[8px] font-black text-brand-muted uppercase bg-white px-4">Atau Gunakan Password</div>
-          </div>
-          
           <input
             type="password"
-            placeholder="Masukkan Password Keamanan"
-            className="w-full p-5 rounded-2xl border border-brand-border mb-4 font-bold text-center bg-brand-surface focus:border-brand-primary transition-all outline-none"
+            placeholder="Ketik password: admin123"
+            className="w-full p-5 rounded-2xl border-2 border-brand-border mb-4 font-bold text-center bg-brand-surface focus:border-brand-primary transition-all outline-none text-lg"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (password === "admin123" ? setIsLoggedIn(true) : setMessage("❌ Password Salah!"))}
           />
+          
           <button
             onClick={() => {
               if (password === "admin123") {
                 setIsLoggedIn(true);
-                setMessage("Login berhasil (Mode Terbatas)");
+                setMessage("✅ Login berhasil (Mode Lokal)");
               } else {
-                setMessage("Gagal: Email belum terdaftar atau password salah.");
+                setMessage("❌ Password salah (Gunakan: admin123)");
               }
             }}
-            className="w-full border-2 border-brand-muted/20 text-brand-dark font-black p-5 rounded-2xl hover:bg-brand-surface transition-all uppercase tracking-widest text-[10px] active:scale-95"
+            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[11px] shadow-xl active:scale-95 mb-8"
           >
-            Masuk dengan Password
+            Masuk Sekarang
           </button>
 
-          {message && <p className="mt-8 text-center text-[9px] font-black text-brand-primary uppercase tracking-[0.2em] italic">{message}</p>}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-border"></div></div>
+            <div className="relative text-[8px] font-black text-brand-muted uppercase bg-white px-4">Atau Gunakan Akun Google</div>
+          </div>
+
+          <button
+            onClick={handleLogin}
+            className="w-full border-2 border-brand-border text-brand-dark font-black p-4 rounded-2xl hover:bg-brand-surface transition-all uppercase tracking-widest text-[9px] flex items-center justify-center gap-3 active:scale-95"
+          >
+            Google Login
+          </button>
+
+          {message && <p className="mt-8 text-center text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] italic bg-brand-primary/5 p-3 rounded-xl">{message}</p>}
           <Link to="/" className="block text-center mt-10 text-[9px] font-black text-brand-muted uppercase tracking-[0.3em] hover:text-brand-dark transition-all italic">
             ← Kembali ke Beranda
           </Link>
