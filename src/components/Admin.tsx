@@ -1,17 +1,45 @@
 import { useState, useEffect } from "react";
-import { Save, Plus, Trash2, ArrowLeft, LogOut } from "lucide-react";
+import { Save, Plus, Trash2, ArrowLeft, LogOut, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
+import { 
+  auth, 
+  db, 
+  googleProvider, 
+  signInWithPopup, 
+  onAuthStateChanged, 
+  signOut, 
+  doc, 
+  getDoc, 
+  setDoc,
+  onSnapshot
+} from "../lib/firebase";
 
 export default function Admin() {
+  const [user, setUser] = useState<any>(null);
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-
-  const [isVercelStatic, setIsVercelStatic] = useState(false);
+  const [isUsingFirebase, setIsUsingFirebase] = useState(false);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) {
+        setIsLoggedIn(true);
+        setIsUsingFirebase(true);
+        // Sync with Firestore
+        loadFromFirestore();
+      } else {
+        loadFromLocalApi();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const loadFromLocalApi = () => {
     fetch("/api/data")
       .then((res) => {
         if (!res.ok) throw new Error("API not available");
@@ -22,24 +50,69 @@ export default function Admin() {
         setLoading(false);
       })
       .catch(() => {
-        setIsVercelStatic(true);
-        // Fallback to empty structure or local storage if we wanted to be fancy, 
-        // but for now just data from data.json if we could, but we can't fetch it if API fails.
         setData({
           settings: { title: "LT 2 Kwarran Jatinagara", year: "2026", location_name: "Bumi Perkemahan", location_address: "" },
           schedule: [],
-          recap: []
+          recap: [],
+          slides: [],
+          news: []
         });
         setLoading(false);
       });
-  }, []);
+  };
+
+  const loadFromFirestore = async () => {
+    try {
+      const siteDoc = await getDoc(doc(db, "settings", "site"));
+      if (siteDoc.exists()) {
+        setData(siteDoc.data());
+      } else {
+        // If not in firestore yet, try local API or default
+        loadFromLocalApi();
+      }
+      setLoading(false);
+    } catch (e) {
+      console.error("Firestore error:", e);
+      loadFromLocalApi();
+    }
+  };
+
+  const handleLogin = async () => {
+    setMessage("Mencoba login...");
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result) {
+        setMessage("Login berhasil!");
+      } else {
+        setMessage("⚠️ Firebase belum dikonfigurasi. Gunakan mode password.");
+      }
+    } catch (e) {
+      setMessage("❌ Login gagal: " + (e as Error).message);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (auth && auth.signOut) await signOut(auth);
+    setIsLoggedIn(false);
+    setIsUsingFirebase(false);
+    setUser(null);
+    setPassword("");
+    setMessage("Anda telah keluar.");
+  };
 
   const handleSave = async () => {
-    if (isVercelStatic) {
-      setMessage("Gagal: Penyimpanan tidak didukung di Vercel Statis. Gunakan Firebase!");
+    setMessage("Sedang menyimpan...");
+    
+    if (isUsingFirebase && db) {
+      try {
+        await setDoc(doc(db, "settings", "site"), data);
+        setMessage("✅ Berhasil disimpan ke Cloud!");
+      } catch (e) {
+        setMessage("❌ Gagal simpan ke Cloud: " + (e as Error).message);
+      }
       return;
     }
-    setMessage("Menyimpan...");
+
     try {
       const res = await fetch("/api/data", {
         method: "POST",
@@ -48,27 +121,50 @@ export default function Admin() {
       });
       const result = await res.json();
       if (result.success) {
-        setMessage("Berhasil disimpan!");
+        setMessage("✅ Berhasil disimpan secara lokal!");
         setIsLoggedIn(true);
       } else {
-        setMessage("Password salah atau gagal menyimpan.");
+        setMessage("❌ Password salah (Gunakan: admin123)");
       }
     } catch (e) {
-      setMessage("Terjadi kesalahan.");
+      setMessage("❌ Terjadi kesalahan saat menyimpan.");
     }
   };
 
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-brand-surface flex items-center justify-center p-6">
+      <div className="text-[10px] font-black uppercase tracking-[0.5em] text-brand-muted animate-pulse">Memuat Data...</div>
+    </div>
+  );
 
-  if (!isLoggedIn && !password) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-brand-surface flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-[32px] shadow-2xl border border-brand-border max-w-md w-full">
-          <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">Admin Login</h2>
+        <div className="bg-white p-12 rounded-[48px] shadow-2xl border border-brand-border max-w-md w-full text-center">
+           <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
+            <LogIn className="w-8 h-8 text-brand-primary" />
+          </div>
+          <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 italic">Admin Portal</h2>
+          <p className="text-xs text-brand-muted font-bold uppercase tracking-widest mb-10 leading-relaxed italic">
+            Pilih metode masuk untuk mengelola data LT 2 Kwarran Jatinagara
+          </p>
+
+          <button
+            onClick={handleLogin}
+            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 mb-6 shadow-xl active:scale-95"
+          >
+            Google Login (Terverifikasi)
+          </button>
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-border"></div></div>
+            <div className="relative text-[8px] font-black text-brand-muted uppercase bg-white px-4">Atau Gunakan Password</div>
+          </div>
+          
           <input
             type="password"
-            placeholder="Masukkan Password Admin"
-            className="w-full p-4 rounded-xl border border-brand-border mb-6 font-bold"
+            placeholder="Masukkan Password Keamanan"
+            className="w-full p-5 rounded-2xl border border-brand-border mb-4 font-bold text-center bg-brand-surface focus:border-brand-primary transition-all outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -76,18 +172,19 @@ export default function Admin() {
             onClick={() => {
               if (password === "admin123") {
                 setIsLoggedIn(true);
-                setMessage("Login berhasil (Mode Offline)");
+                setMessage("Login berhasil (Mode Terbatas)");
               } else {
-                setMessage("Password salah!");
+                setMessage("Gagal: Email belum terdaftar atau password salah.");
               }
             }}
-            className="w-full bg-brand-primary text-white font-bold p-4 rounded-xl hover:bg-brand-dark transition-all uppercase tracking-widest text-xs"
+            className="w-full border-2 border-brand-muted/20 text-brand-dark font-black p-5 rounded-2xl hover:bg-brand-surface transition-all uppercase tracking-widest text-[10px] active:scale-95"
           >
-            Masuk ke Panel
+            Masuk dengan Password
           </button>
-          {message && <p className="mt-4 text-center text-xs font-bold text-red-500 uppercase tracking-widest">{message}</p>}
-          <Link to="/" className="block text-center mt-6 text-xs font-bold text-brand-muted uppercase tracking-widest hover:text-brand-dark">
-            Kembali ke Beranda
+
+          {message && <p className="mt-8 text-center text-[9px] font-black text-brand-primary uppercase tracking-[0.2em] italic">{message}</p>}
+          <Link to="/" className="block text-center mt-10 text-[9px] font-black text-brand-muted uppercase tracking-[0.3em] hover:text-brand-dark transition-all italic">
+            ← Kembali ke Beranda
           </Link>
         </div>
       </div>
@@ -96,30 +193,44 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-brand-surface font-sans">
-      <nav className="bg-white border-b border-brand-border p-6 sticky top-0 z-50 shadow-sm flex justify-between items-center">
+      <nav className="bg-white border-b border-brand-border p-6 sticky top-0 z-50 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-4">
-          <Link to="/" className="p-2 hover:bg-brand-surface rounded-lg transition-colors">
+          <Link to="/" className="p-2 hover:bg-brand-surface rounded-xl transition-colors shrink-0">
             <ArrowLeft className="w-5 h-5 text-brand-muted" />
           </Link>
-          <h1 className="text-xl font-black uppercase tracking-tighter">Admin Panel</h1>
+          <div>
+            <h1 className="text-xl font-black uppercase tracking-tighter italic">Admin Panel</h1>
+            {user && <p className="text-[9px] font-bold text-brand-muted uppercase tracking-widest">{user.email}</p>}
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest italic">{message}</span>
+        <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+          <span className="text-[9px] font-black text-brand-primary uppercase tracking-widest italic animate-pulse">{message}</span>
           <button
             onClick={handleSave}
-            className="bg-brand-primary text-white font-bold px-6 py-2.5 rounded-full text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-brand-dark transition-all shadow-lg"
+            className="bg-brand-primary text-white font-black px-8 py-3.5 rounded-full text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-brand-dark transition-all shadow-xl active:scale-95 disabled:opacity-50"
           >
-            <Save className="w-3 h-3" />
-            Simpan Perubahan
+            <Save className="w-3.5 h-3.5" />
+            Simpan Cloud
           </button>
-          <button onClick={() => setIsLoggedIn(false)} className="p-2 text-brand-muted hover:text-brand-dark">
+          <button onClick={handleLogout} className="p-3 bg-brand-surface text-brand-muted hover:text-brand-primary rounded-xl transition-all">
             <LogOut className="w-5 h-5" />
           </button>
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto p-10 space-y-12">
-        {/* Settings Section */}
+      <main className="max-w-5xl mx-auto p-4 md:p-10 space-y-12">
+        {/* Warnings */}
+        {!isUsingFirebase && (
+          <div className="bg-brand-primary/5 border-2 border-brand-primary/20 p-8 rounded-[32px] flex items-center gap-6">
+            <div className="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center shrink-0">
+              <Plus className="w-6 h-6 text-white rotate-45" />
+            </div>
+            <div>
+              <h4 className="text-sm font-black uppercase tracking-tight italic">Mode Terbatas (Offline)</h4>
+              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest mt-1">Anda menggunakan login password. Data tidak tersimpan di Cloud. Silakan gunakan Google Login.</p>
+            </div>
+          </div>
+        )}
         <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 italic text-brand-primary">Pengaturan Umum</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -147,6 +258,161 @@ export default function Admin() {
                 onChange={(e) => setData({ ...data, settings: { ...data.settings, location_name: e.target.value } })}
               />
             </div>
+          </div>
+        </section>
+
+        {/* Slides Section */}
+        <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-brand-primary">Gambar Slide Beranda</h2>
+            <button
+              onClick={() => {
+                const newSlides = [...(data.slides || [])];
+                newSlides.push({ url: "https://picsum.photos/seed/new/1920/1080", title: "JUDUL SLIDE", desc: "Deskripsi singkat slide." });
+                setData({ ...data, slides: newSlides });
+              }}
+              className="p-3 bg-brand-surface rounded-full text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+            >
+              <Plus className="w-4 h-4" />
+              Tambah Slide
+            </button>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            {(data.slides || []).map((slide: any, idx: number) => (
+              <div key={idx} className="bg-brand-surface p-6 rounded-2xl relative border border-brand-border/10">
+                <button
+                  onClick={() => {
+                    const newSlides = [...data.slides];
+                    newSlides.splice(idx, 1);
+                    setData({ ...data, slides: newSlides });
+                  }}
+                  className="absolute top-4 right-4 text-brand-muted hover:text-brand-primary"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">URL Gambar</label>
+                    <input
+                      className="w-full p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
+                      value={slide.url}
+                      onChange={(e) => {
+                        const newSlides = [...data.slides];
+                        newSlides[idx].url = e.target.value;
+                        setData({ ...data, slides: newSlides });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">Judul</label>
+                    <input
+                      className="w-full p-3 rounded-lg bg-white border border-brand-border font-bold text-xs"
+                      value={slide.title}
+                      onChange={(e) => {
+                        const newSlides = [...data.slides];
+                        newSlides[idx].title = e.target.value;
+                        setData({ ...data, slides: newSlides });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">Deskripsi</label>
+                    <textarea
+                      className="w-full p-3 rounded-lg bg-white border border-brand-border text-xs min-h-[60px]"
+                      value={slide.desc}
+                      onChange={(e) => {
+                        const newSlides = [...data.slides];
+                        newSlides[idx].desc = e.target.value;
+                        setData({ ...data, slides: newSlides });
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* News Section */}
+        <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-brand-primary">Berita & Artikel</h2>
+            <button
+              onClick={() => {
+                const newNews = [...(data.news || [])];
+                newNews.unshift({ 
+                  id: Date.now(), 
+                  title: "Judul Berita Baru", 
+                  excerpt: "Ringkasan isi berita yang menarik...", 
+                  date: new Date().toISOString().split('T')[0], 
+                  image: "https://picsum.photos/seed/news/600/400" 
+                });
+                setData({ ...data, news: newNews });
+              }}
+              className="p-3 bg-brand-surface rounded-full text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+            >
+              <Plus className="w-4 h-4" />
+              Tulis Berita
+            </button>
+          </div>
+          <div className="space-y-6">
+            {(data.news || []).map((article: any, idx: number) => (
+              <div key={idx} className="bg-brand-surface p-6 rounded-3xl border border-brand-border/10 flex flex-col md:flex-row gap-6 items-start">
+                <div className="w-full md:w-48 h-32 rounded-xl overflow-hidden bg-white border border-brand-border">
+                  <img src={article.image} alt="" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 space-y-4 w-full">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">Judul Berita</label>
+                      <input
+                        className="w-full p-3 rounded-lg bg-white border border-brand-border font-bold text-sm"
+                        value={article.title}
+                        onChange={(e) => {
+                          const newNews = [...data.news];
+                          newNews[idx].title = e.target.value;
+                          setData({ ...data, news: newNews });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">URL Gambar Thumbnail</label>
+                      <input
+                        className="w-full p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
+                        value={article.image}
+                        onChange={(e) => {
+                          const newNews = [...data.news];
+                          newNews[idx].image = e.target.value;
+                          setData({ ...data, news: newNews });
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">Ringkasan (Excerpt)</label>
+                    <textarea
+                      className="w-full p-3 rounded-lg bg-white border border-brand-border text-sm min-h-[80px]"
+                      value={article.excerpt}
+                      onChange={(e) => {
+                        const newNews = [...data.news];
+                        newNews[idx].excerpt = e.target.value;
+                        setData({ ...data, news: newNews });
+                      }}
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    const newNews = [...data.news];
+                    newNews.splice(idx, 1);
+                    setData({ ...data, news: newNews });
+                  }}
+                  className="p-3 text-brand-muted hover:text-brand-primary"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
           </div>
         </section>
 

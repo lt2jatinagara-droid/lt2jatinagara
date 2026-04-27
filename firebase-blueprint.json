@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "SiteData": {
+      "title": "Site Data",
+      "description": "General settings and site content for LT 2 Kwarran Jatinagara",
+      "type": "object",
+      "properties": {
+        "settings": { "type": "object" },
+        "schedule": { "type": "array" },
+        "recap": { "type": "array" },
+        "slides": { "type": "array" },
+        "news": { "type": "array" }
+      },
+      "required": ["settings"]
+    }
+  },
+  "firestore": {
+    "/settings/site": {
+      "schema": "SiteData",
+      "description": "The main site configuration and content"
+    }
+  }
+}

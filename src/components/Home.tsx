@@ -5,6 +5,7 @@ import {
   Calendar, 
   Users, 
   Clock, 
+  ChevronLeft,
   ChevronRight, 
   Menu, 
   X, 
@@ -15,10 +16,19 @@ import {
   Phone,
   Mail,
   Instagram,
-  Facebook
+  Facebook,
+  Youtube,
+  MessageCircle,
+  ExternalLink,
+  Globe
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { 
+  db, 
+  doc, 
+  onSnapshot 
+} from "../lib/firebase";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,66 +36,13 @@ export default function Home() {
   const [activeDay, setActiveDay] = useState(0);
   const [siteData, setSiteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
-  const DEFAULT_DATA = {
-    schedule: [
-      {
-        day: "Hari 1",
-        date: "Selasa, 28 Juli 2026",
-        events: [
-          { time: "08:00 - 10:00", name: "Registrasi Peserta", location: "Gerbang Utama" },
-          { time: "10:00 - 11:30", name: "Upacara Pembukaan", location: "Lapangan Utama" },
-          { time: "11:30 - 13:30", name: "ISHOMA & Pendirian Tenda", location: "Area Perkemahan" },
-          { time: "14:00 - 17:00", name: "Lomba Pionering", location: "Lapangan B" },
-          { time: "19:30 - 21:30", name: "Malam Keakraban", location: "Panggung Utama" }
-        ]
-      },
-      {
-        day: "Hari 2",
-        date: "Rabu, 29 Juli 2026",
-        events: [
-          { time: "08:00 - 12:00", name: "Jelajah Alam (Wide Game)", location: "Rute Sekitar Jatinagara" },
-          { time: "13:30 - 16:30", name: "Lomba PBB & Semaphore", location: "Lapangan Utama" },
-          { time: "19:30 - 22:00", name: "Api Unggun & Pentas Seni", location: "Lapangan Utama" }
-        ]
-      },
-      {
-        day: "Hari 3",
-        date: "Kamis, 30 Juli 2026",
-        events: [
-          { time: "08:00 - 10:00", name: "Bakti Masyarakat", location: "Desa Sekitar" },
-          { time: "10:30 - 12:00", name: "Upacara Penutupan & Pengumuman", location: "Lapangan Utama" },
-          { time: "12:00 - 14:00", name: "Sayonara & Pembongkaran Tenda", location: "Area Perkemahan" }
-        ]
-      }
-    ],
-    recap: [
-      { 
-        rank: 1, 
-        team: "Regu Garuda", 
-        tent_no: "A-01",
-        scores: [100, 95, 90, 85, 100, 90, 80, 95, 100, 90, 85, 90, 100, 95, 90, 85, 100, 90, 80, 95],
-        total: 1855
-      },
-      { 
-        rank: 2, 
-        team: "Regu Melati", 
-        tent_no: "B-04",
-        scores: [90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80],
-        total: 1810
-      }
-    ],
-    settings: {
-      year: "2026",
-      location_name: "Bumi Perkemahan Jatinagara",
-      location_address: "Jl. Raya Jatinagara No. 45, Ciamis, Jawa Barat."
-    }
-  };
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     
+    // Initial load from local API
     fetch("/api/data")
       .then(res => {
         if (!res.ok) throw new Error("API not available");
@@ -96,23 +53,51 @@ export default function Home() {
         setLoading(false);
       })
       .catch(err => {
-        console.warn("Using fallback data because:", err.message);
-        setSiteData(DEFAULT_DATA);
-        setLoading(false);
+        console.warn("Local API load failed, waiting for Cloud sync...", err.message);
       });
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Real-time sync with Cloud (Firebase)
+    const unsubscribe = onSnapshot(doc(db, "settings", "site"), (docSnap) => {
+      if (docSnap.exists()) {
+        setSiteData(docSnap.data());
+        setLoading(false);
+      }
+    }, (error) => {
+      console.warn("Firebase sync error:", error.message);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      unsubscribe();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!siteData?.slides?.length) return;
+    
+    const slideTimer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % siteData.slides.length);
+    }, 6000);
+
+    return () => clearInterval(slideTimer);
+  }, [siteData]);
 
   if (loading || !siteData) return <div className="min-h-screen bg-brand-surface flex items-center justify-center font-bold uppercase tracking-widest text-brand-muted">Loading...</div>;
 
-  const { schedule, recap, settings } = siteData;
+  const { schedule, recap, settings, slides = [], news = [] } = siteData;
 
   const COMPETITIONS = [
     { id: 1, name: "Pionering", icon: <Tent className="w-6 h-6" />, desc: "Ketangkasan membuat bangunan darurat menggunakan tali dan tongkat." },
     { id: 2, name: "Semaphore & Morse", icon: <Compass className="w-6 h-6" />, desc: "Adu cepat dan tepat dalam berkirim pesan rahasia jarak jauh." },
     { id: 3, name: "PBB & Variasi", icon: <Users className="w-6 h-6" />, desc: "Kerapian dan kekompakan dalam baris berbaris." },
     { id: 4, name: "Pentas Seni", icon: <Flame className="w-6 h-6" />, desc: "Menampilkan bakat seni budaya dari masing-masing regu." },
+  ];
+
+  const SOCIAL_PLATFORMS = [
+    { name: "Instagram", icon: <Instagram className="w-6 h-6" />, handle: "@pramukajatinagara_", url: "https://instagram.com/pramukajatinagara_", color: "bg-pink-600" },
+    { name: "YouTube", icon: <Youtube className="w-6 h-6" />, handle: "Pramuka Jatinagara", url: "https://youtube.com/@pramukajatinagara", color: "bg-red-600" },
+    { name: "WhatsApp", icon: <MessageCircle className="w-6 h-6" />, handle: "Official Admin", url: "https://wa.me/6281234567890", color: "bg-green-600" },
+    { name: "Facebook", icon: <Facebook className="w-6 h-6" />, handle: "Kwarran Jatinagara", url: "https://facebook.com/kwarran.jatinagara", color: "bg-blue-600" },
   ];
 
   const DOCUMENTS = [
@@ -128,19 +113,18 @@ export default function Home() {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "bg-white border-b border-brand-border py-4" : "bg-transparent py-6"}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">P</div>
             <div>
               <h1 className={`text-sm font-black uppercase tracking-tighter leading-none ${scrolled ? "text-brand-dark" : "text-white"}`}>
                 LT 2 KWARRAN
               </h1>
-              <p className={`text-[10px] font-semibold tracking-widest uppercase leading-none mt-1 ${scrolled ? "text-brand-primary" : "text-brand-primary"}`}>
-                {settings.year}
+              <p className={`text-[20px] font-semibold tracking-widest uppercase leading-none mt-1 ${scrolled ? "text-brand-primary" : "text-brand-primary"}`}>
+                JATINAGARA
               </p>
             </div>
           </div>
           
           <div className="hidden md:flex gap-6 text-xs font-bold uppercase tracking-wider">
-            {["Beranda", "Tentang", "Jadwal", "Lomba", "Denah", "Rekap", "Dokumen", "Lokasi"].map((item) => (
+            {["Beranda", "Tentang", "Berita", "Jadwal", "Lomba", "Denah", "Rekap", "Dokumen", "Lokasi"].map((item) => (
               <a 
                 key={item} 
                 href={`#${item.toLowerCase()}`}
@@ -170,7 +154,7 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="absolute top-full left-0 w-full bg-white shadow-xl p-6 md:hidden flex flex-col gap-4"
             >
-              {["Beranda", "Tentang", "Jadwal", "Lomba", "Denah", "Rekap", "Dokumen", "Lokasi"].map((item) => (
+              {["Beranda", "Tentang", "Berita", "Jadwal", "Lomba", "Denah", "Rekap", "Dokumen", "Lokasi"].map((item) => (
                 <a 
                   key={item} 
                   href={`#${item.toLowerCase()}`}
@@ -189,34 +173,94 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="beranda" className="h-screen sleek-bg flex flex-col items-center justify-center text-center px-6 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="z-10 text-white max-w-5xl"
-        >
-          <div className="inline-block bg-brand-primary text-white text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-8 italic shadow-xl">
-            Menuju Kemandirian & Karakter Bangsa
-          </div>
-          <h1 className="text-2xl md:text-4xl font-black mb-8 leading-tight tracking-tighter">
-            LOMBA<br />
-            <span className="text-brand-primary">TINGKAT II</span>
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 mb-12 max-w-xl mx-auto leading-relaxed">
-            Ajang kompetisi pramuka penggalang tingkat Kwartir Ranting Jatinagara. Persiapkan regu terbaikmu untuk menuju LT 3 Kabupaten Ciamis.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-5 justify-center">
-            <a href="#jadwal" className="bg-brand-primary hover:bg-red-700 text-white font-bold px-10 py-5 rounded-full uppercase tracking-widest text-xs transition-all transform hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Lihat Jadwal
-            </a>
-            <a href="#tentang" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-bold px-10 py-5 rounded-full border border-white/20 uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
-              Informasi Detail
-              <ChevronRight className="w-4 h-4" />
-            </a>
-          </div>
-        </motion.div>
+      <section id="beranda" className="h-screen bg-black flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+        {/* Image Slider Component */}
+        <div className="absolute inset-0 z-0 text-white">
+          {slides.length > 0 ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80 z-10" />
+                <img 
+                  src={slides[currentSlide]?.url} 
+                  alt={slides[currentSlide]?.title}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </motion.div>
+            </AnimatePresence>
+          ) : (
+            <div className="absolute inset-0 bg-brand-dark" />
+          )}
+        </div>
+
+        {slides.length > 0 && (
+          <motion.div
+            key={`content-${currentSlide}`}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="z-10 text-white max-w-5xl"
+          >
+            <div className="inline-block bg-brand-primary text-white text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-8 italic shadow-xl">
+              {slides[currentSlide]?.desc}
+            </div>
+            <h1 className="text-4xl md:text-7xl font-black mb-8 leading-tight tracking-tighter uppercase">
+              {slides[currentSlide]?.title}<br />
+              <span className="text-brand-primary">TINGKAT II</span>
+            </h1>
+            <p className="text-lg md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+              Lomba Pramuka Penggalang Kwartir Ranting Jatinagara {settings.year}. Ajang kompetisi paling bergengsi tahun ini!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-5 justify-center">
+              <a href="#jadwal" className="bg-brand-primary hover:bg-red-700 text-white font-bold px-10 py-5 rounded-full uppercase tracking-widest text-xs transition-all transform hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Lihat Jadwal
+              </a>
+              <a href="#tentang" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-bold px-10 py-5 rounded-full border border-white/20 uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+                Informasi Detail
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Slider Controls */}
+        {slides.length > 1 && (
+          <>
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-6 z-20 pointer-events-none">
+              <button 
+                onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+                className="p-4 rounded-full bg-white/5 hover:bg-brand-primary text-white backdrop-blur-md pointer-events-auto transition-all border border-white/10 group"
+              >
+                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+              </button>
+              <button 
+                onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+                className="p-4 rounded-full bg-white/5 hover:bg-brand-primary text-white backdrop-blur-md pointer-events-auto transition-all border border-white/10 group"
+              >
+                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Slider Indicators */}
+            <div className="absolute bottom-32 left-0 w-full flex justify-center gap-3 z-20">
+              {slides.map((_: any, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentSlide(i)}
+                  className={`h-1.5 transition-all duration-500 rounded-full ${i === currentSlide ? "w-10 bg-brand-primary" : "w-4 bg-white/30"}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Floating Stats */}
         <div className="absolute bottom-10 left-0 w-full hidden md:block">
@@ -246,6 +290,58 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* News/Berita Section */}
+      {news.length > 0 && (
+        <section id="berita" className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+              <div>
+                <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">Berita & Artikel</h2>
+                <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Kabar Terbaru Seputar LT 2 Jatinagara</p>
+              </div>
+              <a href="#" className="text-xs font-black uppercase tracking-widest text-brand-primary hover:text-brand-dark transition-colors pb-1 border-b-2 border-brand-primary">
+                Lihat Semua Berita →
+              </a>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {news.map((item: any, i: number) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="group"
+                >
+                  <div className="aspect-[16/10] rounded-[32px] overflow-hidden bg-brand-surface border border-brand-border mb-6 relative">
+                    <img 
+                      src={item.image} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-brand-primary shadow-lg group-hover:bg-brand-primary group-hover:text-white transition-all">
+                        {item.date}
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-brand-primary transition-colors line-clamp-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-brand-muted leading-relaxed line-clamp-3 mb-6 italic">
+                    {item.excerpt}
+                  </p>
+                  <button className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:gap-3 transition-all flex items-center gap-2">
+                    Baca Selengkapnya <ChevronRight className="w-3 h-3" />
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Hero Stats */}
       <section className="bg-white border-b border-brand-border py-12 hidden md:block">
@@ -500,6 +596,42 @@ export default function Home() {
       </section>
 
       {/* Location Area */}
+      <section id="platform" className="py-24 bg-brand-surface border-y border-brand-border overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div>
+              <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">Platform Resmi</h2>
+              <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Terhubung Melalui Ekosistem Digital Kami</p>
+            </div>
+          </div>
+          <div className="grid md:grid-cols-4 gap-6">
+            {SOCIAL_PLATFORMS.map((platform, i) => (
+              <motion.a
+                key={i}
+                href={platform.url}
+                target="_blank"
+                rel="noreferrer"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white p-8 rounded-[32px] border border-brand-border flex flex-col items-center text-center group hover:bg-black hover:border-black transition-all duration-300 shadow-xl"
+              >
+                <div className={`w-16 h-16 ${platform.color} text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                  {platform.icon}
+                </div>
+                <h4 className="text-lg font-black uppercase text-black group-hover:text-white transition-colors">{platform.name}</h4>
+                <p className="text-xs text-brand-muted font-bold group-hover:text-white/60 transition-colors uppercase mt-1 italic">{platform.handle}</p>
+                <div className="mt-8 text-[10px] font-black text-brand-primary uppercase tracking-widest flex items-center gap-2 group-hover:text-white">
+                  Kunjungi <ExternalLink className="w-3 h-3" />
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Location Area */}
       <section id="lokasi" className="py-24 bg-white overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -551,10 +683,9 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">P</div>
                 <div>
                    <h4 className="text-md font-black uppercase tracking-tighter text-black leading-none">LT 2 Kwarran</h4>
-                   <p className="text-[10px] font-semibold text-brand-primary tracking-widest uppercase leading-none mt-1">Jatinagara {settings.year}</p>
+                   <p className="text-[10px] font-semibold text-brand-primary tracking-widest uppercase leading-none mt-1">JATINAGARA</p>
                 </div>
               </div>
               <p className="text-brand-muted text-xs font-medium uppercase tracking-[0.1em] max-w-sm mb-8 italic">
@@ -601,9 +732,9 @@ export default function Home() {
         href="https://wa.me/6281234567890" 
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-10 right-10 z-50 bg-brand-primary text-white p-5 rounded-full shadow-2xl hover:bg-brand-dark hover:scale-110 active:scale-95 transition-all group"
+        className="fixed bottom-10 right-10 z-50 bg-green-600 text-white p-5 rounded-full shadow-2xl hover:bg-green-700 hover:scale-110 active:scale-95 transition-all group"
       >
-        <Phone className="w-6 h-6" />
+        <MessageCircle className="w-6 h-6" />
         <span className="absolute right-full mr-6 bg-brand-dark text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none translate-x-4 group-hover:translate-x-0">
           WhatsApp Panitia
         </span>

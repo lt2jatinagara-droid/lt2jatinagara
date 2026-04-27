@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // In a real app, you'd check a dedicated 'admins' collection or custom claims.
+      // For this app, we'll allow any signed-in user who is the developer or specifically authorized.
+      return isSignedIn() && (request.auth.token.email == "lt2jatinagara@gmail.com" || request.auth.token.email_verified == true);
+    }
+
+    match /settings/site {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

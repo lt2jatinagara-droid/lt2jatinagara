@@ -53,6 +53,37 @@
     }
   ],
   "announcements": [],
+  "slides": [
+    { 
+      "url": "https://picsum.photos/seed/scout1/1920/1080", 
+      "title": "SEMANGAT JUANG", 
+      "desc": "Menempa karakter penggalang yang tangguh dan disiplin." 
+    },
+    { 
+      "url": "https://picsum.photos/seed/scout2/1920/1080", 
+      "title": "KARYA NYATA", 
+      "desc": "Membangun kemandirian melalui Scouting Skill yang mumpuni." 
+    },
+    { 
+      "url": "https://picsum.photos/seed/scout3/1920/1080", 
+      "title": "SENI BUDAYA", 
+      "desc": "Melestarikan tradisi dalam balutan jiwa kepanduan." 
+    },
+    { 
+      "url": "https://picsum.photos/seed/scout4/1920/1080", 
+      "title": "PERSAUDARAAN", 
+      "desc": "Mempererat tali silaturahmi antar gugus depan se-Jatinagara." 
+    }
+  ],
+  "news": [
+    {
+      "id": 1,
+      "title": "Persiapan LT 2 Jatinagara Memasuki Tahap Akhir",
+      "excerpt": "Panitia penyelenggara memastikan semua persiapan teknis telah mencapai 95%.",
+      "date": "2026-07-20",
+      "image": "https://picsum.photos/seed/news1/600/400"
+    }
+  ],
   "settings": {
     "title": "LT 2 Kwarran Jatinagara",
     "year": "2026",
