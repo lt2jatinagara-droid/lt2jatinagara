@@ -9,16 +9,36 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
+  const [isVercelStatic, setIsVercelStatic] = useState(false);
+
   useEffect(() => {
     fetch("/api/data")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("API not available");
+        return res.json();
+      })
       .then((d) => {
         setData(d);
+        setLoading(false);
+      })
+      .catch(() => {
+        setIsVercelStatic(true);
+        // Fallback to empty structure or local storage if we wanted to be fancy, 
+        // but for now just data from data.json if we could, but we can't fetch it if API fails.
+        setData({
+          settings: { title: "LT 2 Kwarran Jatinagara", year: "2026", location_name: "Bumi Perkemahan", location_address: "" },
+          schedule: [],
+          recap: []
+        });
         setLoading(false);
       });
   }, []);
 
   const handleSave = async () => {
+    if (isVercelStatic) {
+      setMessage("Gagal: Penyimpanan tidak didukung di Vercel Statis. Gunakan Firebase!");
+      return;
+    }
     setMessage("Menyimpan...");
     try {
       const res = await fetch("/api/data", {
@@ -53,11 +73,19 @@ export default function Admin() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
-            onClick={() => setIsLoggedIn(true)}
+            onClick={() => {
+              if (password === "admin123") {
+                setIsLoggedIn(true);
+                setMessage("Login berhasil (Mode Offline)");
+              } else {
+                setMessage("Password salah!");
+              }
+            }}
             className="w-full bg-brand-primary text-white font-bold p-4 rounded-xl hover:bg-brand-dark transition-all uppercase tracking-widest text-xs"
           >
             Masuk ke Panel
           </button>
+          {message && <p className="mt-4 text-center text-xs font-bold text-red-500 uppercase tracking-widest">{message}</p>}
           <Link to="/" className="block text-center mt-6 text-xs font-bold text-brand-muted uppercase tracking-widest hover:text-brand-dark">
             Kembali ke Beranda
           </Link>

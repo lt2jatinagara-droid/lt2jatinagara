@@ -27,14 +27,77 @@ export default function Home() {
   const [siteData, setSiteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const DEFAULT_DATA = {
+    schedule: [
+      {
+        day: "Hari 1",
+        date: "Selasa, 28 Juli 2026",
+        events: [
+          { time: "08:00 - 10:00", name: "Registrasi Peserta", location: "Gerbang Utama" },
+          { time: "10:00 - 11:30", name: "Upacara Pembukaan", location: "Lapangan Utama" },
+          { time: "11:30 - 13:30", name: "ISHOMA & Pendirian Tenda", location: "Area Perkemahan" },
+          { time: "14:00 - 17:00", name: "Lomba Pionering", location: "Lapangan B" },
+          { time: "19:30 - 21:30", name: "Malam Keakraban", location: "Panggung Utama" }
+        ]
+      },
+      {
+        day: "Hari 2",
+        date: "Rabu, 29 Juli 2026",
+        events: [
+          { time: "08:00 - 12:00", name: "Jelajah Alam (Wide Game)", location: "Rute Sekitar Jatinagara" },
+          { time: "13:30 - 16:30", name: "Lomba PBB & Semaphore", location: "Lapangan Utama" },
+          { time: "19:30 - 22:00", name: "Api Unggun & Pentas Seni", location: "Lapangan Utama" }
+        ]
+      },
+      {
+        day: "Hari 3",
+        date: "Kamis, 30 Juli 2026",
+        events: [
+          { time: "08:00 - 10:00", name: "Bakti Masyarakat", location: "Desa Sekitar" },
+          { time: "10:30 - 12:00", name: "Upacara Penutupan & Pengumuman", location: "Lapangan Utama" },
+          { time: "12:00 - 14:00", name: "Sayonara & Pembongkaran Tenda", location: "Area Perkemahan" }
+        ]
+      }
+    ],
+    recap: [
+      { 
+        rank: 1, 
+        team: "Regu Garuda", 
+        tent_no: "A-01",
+        scores: [100, 95, 90, 85, 100, 90, 80, 95, 100, 90, 85, 90, 100, 95, 90, 85, 100, 90, 80, 95],
+        total: 1855
+      },
+      { 
+        rank: 2, 
+        team: "Regu Melati", 
+        tent_no: "B-04",
+        scores: [90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80],
+        total: 1810
+      }
+    ],
+    settings: {
+      year: "2026",
+      location_name: "Bumi Perkemahan Jatinagara",
+      location_address: "Jl. Raya Jatinagara No. 45, Ciamis, Jawa Barat."
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     
     fetch("/api/data")
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("API not available");
+        return res.json();
+      })
       .then(data => {
         setSiteData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.warn("Using fallback data because:", err.message);
+        setSiteData(DEFAULT_DATA);
         setLoading(false);
       });
 
