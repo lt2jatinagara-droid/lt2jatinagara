@@ -24,10 +24,9 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { doc, onSnapshot } from "firebase/firestore";
 import { 
   db, 
-  doc, 
-  onSnapshot 
 } from "../lib/firebase";
 
 export default function Home() {

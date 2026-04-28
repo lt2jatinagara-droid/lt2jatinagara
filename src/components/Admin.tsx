@@ -1,17 +1,12 @@
 import { useState, useEffect } from "react";
 import { Save, Plus, Trash2, ArrowLeft, LogOut, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
+import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { 
   auth, 
   db, 
   googleProvider, 
-  signInWithPopup, 
-  onAuthStateChanged, 
-  signOut, 
-  doc, 
-  getDoc, 
-  setDoc,
-  onSnapshot
 } from "../lib/firebase";
 
 export default function Admin() {
