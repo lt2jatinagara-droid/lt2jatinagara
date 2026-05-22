@@ -89,5 +89,11 @@
     "year": "2026",
     "location_name": "Bumi Perkemahan Jatinagara",
     "location_address": "Jl. Raya Jatinagara No. 45, Ciamis, Jawa Barat."
-  }
+  },
+  "documents": [
+    { "title": "Petunjuk Teknis LT 2", "type": "PDF", "size": "2.4 MB", "url": "https://example.com/petunjuk-teknis" },
+    { "title": "Formulir Pendaftaran", "type": "DOCX", "size": "1.1 MB", "url": "https://example.com/formulir" },
+    { "title": "Daftar Perlengkapan", "type": "PDF", "size": "850 KB", "url": "https://example.com/perlengkapan" },
+    { "title": "Surat Izin Orang Tua", "type": "PDF", "size": "420 KB", "url": "https://example.com/surat-izin" }
+  ]
 }

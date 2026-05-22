@@ -99,12 +99,14 @@ export default function Home() {
     { name: "Facebook", icon: <Facebook className="w-6 h-6" />, handle: "Kwarran Jatinagara", url: "https://facebook.com/kwarran.jatinagara", color: "bg-blue-600" },
   ];
 
-  const DOCUMENTS = [
-    { title: "Petunjuk Teknis LT 2", type: "PDF", size: "2.4 MB" },
-    { title: "Formulir Pendaftaran", type: "DOCX", size: "1.1 MB" },
-    { title: "Daftar Perlengkapan", type: "PDF", size: "850 KB" },
-    { title: "Surat Izin Orang Tua", type: "PDF", size: "420 KB" },
-  ];
+  const DOCUMENTS = siteData.documents && siteData.documents.length > 0
+    ? siteData.documents
+    : [
+        { title: "Petunjuk Teknis LT 2", type: "PDF", size: "2.4 MB", url: "https://example.com/petunjuk-teknis" },
+        { title: "Formulir Pendaftaran", type: "DOCX", size: "1.1 MB", url: "https://example.com/formulir" },
+        { title: "Daftar Perlengkapan", type: "PDF", size: "850 KB", url: "https://example.com/perlengkapan" },
+        { title: "Surat Izin Orang Tua", type: "PDF", size: "420 KB", url: "https://example.com/surat-izin" },
+      ];
 
   return (
     <div className="min-h-screen selection:bg-brand-primary selection:text-white">
@@ -575,7 +577,13 @@ export default function Home() {
            </div>
            <div className="grid sm:grid-cols-2 gap-6">
               {DOCUMENTS.map((doc, i) => (
-                <div key={i} className="p-8 bg-brand-surface border border-brand-border rounded-3xl flex items-center justify-between group hover:border-brand-primary transition-all">
+                <a 
+                  key={i} 
+                  href={doc.url || "#"} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-8 bg-brand-surface border border-brand-border rounded-3xl flex items-center justify-between group hover:border-brand-primary transition-all cursor-pointer text-left block"
+                >
                   <div className="flex items-center gap-6">
                     <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-primary shadow-sm group-hover:scale-110 transition-transform">
                        <Mail className="w-6 h-6" />
@@ -585,10 +593,10 @@ export default function Home() {
                       <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">{doc.type} • {doc.size}</p>
                     </div>
                   </div>
-                  <button className="p-3 bg-white border border-brand-border rounded-xl text-brand-muted hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all shadow-sm">
+                  <div className="p-3 bg-white border border-brand-border rounded-xl text-brand-muted group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-all shadow-sm">
                     <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
+                  </div>
+                </a>
               ))}
            </div>
         </div>

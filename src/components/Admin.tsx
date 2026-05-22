@@ -56,7 +56,8 @@ export default function Admin() {
           schedule: [],
           recap: [],
           slides: [],
-          news: []
+          news: [],
+          documents: []
         });
         setLoading(false);
       });
@@ -152,7 +153,7 @@ export default function Admin() {
 
           <input
             type="password"
-            placeholder="Ketik password: admin123"
+            placeholder="password"
             className="w-full p-5 rounded-2xl border-2 border-brand-border mb-4 font-bold text-center bg-brand-surface focus:border-brand-primary transition-all outline-none text-lg"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -416,6 +417,106 @@ export default function Admin() {
                 </button>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Documents Section */}
+        <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-brand-primary">Kelola Dokumen Unduhan</h2>
+            <button
+              onClick={() => {
+                const newDocs = [...(data.documents || [])];
+                newDocs.push({ 
+                  title: "Dokumen Baru", 
+                  type: "PDF", 
+                  size: "1.0 MB", 
+                  url: "" 
+                });
+                setData({ ...data, documents: newDocs });
+              }}
+              className="p-3 bg-brand-surface rounded-full text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+            >
+              <Plus className="w-4 h-4" />
+              Tambah Dokumen
+            </button>
+          </div>
+          <div className="space-y-6">
+            {!(data.documents && data.documents.length) ? (
+              <p className="text-xs text-brand-muted font-bold uppercase tracking-widest text-center py-6 italic">Belum ada dokumen. Klik tombol di atas untuk menambahkan.</p>
+            ) : (
+              (data.documents || []).map((docItem: any, idx: number) => (
+                <div key={idx} className="bg-brand-surface p-6 rounded-3xl border border-brand-border/10 flex flex-col md:flex-row gap-6 items-center">
+                  <div className="flex-1 space-y-4 w-full">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Nama/Judul Dokumen</label>
+                        <input
+                          className="w-full p-3 rounded-lg bg-white border border-brand-border font-bold text-sm"
+                          value={docItem.title || ""}
+                          onChange={(e) => {
+                            const newDocs = [...data.documents];
+                            newDocs[idx].title = e.target.value;
+                            setData({ ...data, documents: newDocs });
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">URL Download / Tautan</label>
+                        <input
+                          className="w-full p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
+                          value={docItem.url || ""}
+                          placeholder="Contoh: https://drive.google.com/..."
+                          onChange={(e) => {
+                            const newDocs = [...data.documents];
+                            newDocs[idx].url = e.target.value;
+                            setData({ ...data, documents: newDocs });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Tipe File</label>
+                        <input
+                          className="w-full p-3 rounded-lg bg-white border border-brand-border text-xs"
+                          value={docItem.type || ""}
+                          placeholder="Misal: PDF, DOCX, ZIP"
+                          onChange={(e) => {
+                            const newDocs = [...data.documents];
+                            newDocs[idx].type = e.target.value;
+                            setData({ ...data, documents: newDocs });
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Ukuran File</label>
+                        <input
+                          className="w-full p-3 rounded-lg bg-white border border-brand-border text-xs"
+                          value={docItem.size || ""}
+                          placeholder="Misal: 1.2 MB, 850 KB"
+                          onChange={(e) => {
+                            const newDocs = [...data.documents];
+                            newDocs[idx].size = e.target.value;
+                            setData({ ...data, documents: newDocs });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newDocs = [...data.documents];
+                      newDocs.splice(idx, 1);
+                      setData({ ...data, documents: newDocs });
+                    }}
+                    className="p-3 text-brand-muted hover:text-brand-primary"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </section>
 

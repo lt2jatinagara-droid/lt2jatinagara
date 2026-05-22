@@ -9,7 +9,8 @@
         "schedule": { "type": "array" },
         "recap": { "type": "array" },
         "slides": { "type": "array" },
-        "news": { "type": "array" }
+        "news": { "type": "array" },
+        "documents": { "type": "array" }
       },
       "required": ["settings"]
     }
