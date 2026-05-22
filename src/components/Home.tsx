@@ -20,7 +20,8 @@ import {
   Youtube,
   MessageCircle,
   ExternalLink,
-  Globe
+  Globe,
+  MoreVertical
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -31,6 +32,7 @@ import {
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDay, setActiveDay] = useState(0);
   const [siteData, setSiteData] = useState<any>(null);
@@ -114,6 +116,12 @@ export default function Home() {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "bg-white border-b border-brand-border py-4" : "bg-transparent py-6"}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
+            <img 
+              src="https://i.imgur.com/3jPMvNa.png" 
+              alt="Logo LT2 Kwarran Jatinagara" 
+              className="w-10 h-10 object-contain"
+              referrerPolicy="no-referrer"
+            />
             <div>
               <h1 className={`text-sm font-black uppercase tracking-tighter leading-none ${scrolled ? "text-brand-dark" : "text-white"}`}>
                 LT 2 KWARRAN
@@ -136,10 +144,43 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
-            <Link to="/admin" className={`hidden md:block text-[10px] font-black px-6 py-3 rounded-full uppercase tracking-widest transition-all shadow-xl hover:scale-105 active:scale-95 ${scrolled ? "bg-brand-primary text-white hover:bg-brand-dark" : "bg-brand-primary text-white hover:bg-white hover:text-brand-primary"}`}>
-              Admin Panel
-            </Link>
+          <div className="flex items-center gap-4 relative">
+            <div className="relative">
+              <button 
+                onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                className={`p-2 rounded-full cursor-pointer hover:bg-black/5 active:scale-95 transition-all ${scrolled ? "text-brand-dark hover:bg-brand-surface" : "text-white hover:bg-white/10"}`}
+                title="Admin Menu"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
+
+              <AnimatePresence>
+                {isAdminMenuOpen && (
+                  <>
+                    {/* Click outside overlay */}
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-brand-border p-3 z-50 flex flex-col gap-2"
+                    >
+                      <Link 
+                        to="/admin" 
+                        onClick={() => setIsAdminMenuOpen(false)}
+                        className="text-center bg-brand-primary text-white font-black py-3 px-4 rounded-xl text-[10px] uppercase tracking-widest hover:bg-brand-dark transition-all block"
+                      >
+                        Admin Panel
+                      </Link>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
             <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className={scrolled ? "text-brand-dark" : "text-white"} /> : <Menu className={scrolled ? "text-brand-dark" : "text-white"} />}
             </button>
@@ -165,9 +206,6 @@ export default function Home() {
                   {item}
                 </a>
               ))}
-              <Link to="/admin" className="mt-4 w-full text-center bg-brand-primary text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-lg">
-                Masuk Panel Admin
-              </Link>
             </motion.div>
           )}
         </AnimatePresence>
