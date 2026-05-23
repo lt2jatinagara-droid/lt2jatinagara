@@ -8,6 +8,7 @@ import {
   db, 
   googleProvider, 
 } from "../lib/firebase";
+import rawFallbackData from "../../data.json";
 
 export default function Admin() {
   const [user, setUser] = useState<any>(null);
@@ -60,14 +61,8 @@ export default function Admin() {
         setLoading(false);
       })
       .catch(() => {
-        setData({
-          settings: { title: "LT 2 Kwarran Jatinagara", year: "2026", location_name: "Bumi Perkemahan", location_address: "" },
-          schedule: [],
-          recap: [],
-          slides: [],
-          news: [],
-          documents: []
-        });
+        console.warn("Local API/Vercel offline. Using client-side data.json configuration.");
+        setData(rawFallbackData);
         setLoading(false);
       });
   };

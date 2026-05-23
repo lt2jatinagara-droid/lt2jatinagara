@@ -29,6 +29,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { 
   db, 
 } from "../lib/firebase";
+import rawFallbackData from "../../data.json";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,7 +55,9 @@ export default function Home() {
         setLoading(false);
       })
       .catch(err => {
-        console.warn("Local API load failed, waiting for Cloud sync...", err.message);
+        console.warn("Local API/Vercel backend offline. Using robust data.json fallback...", err.message);
+        setSiteData(rawFallbackData);
+        setLoading(false);
       });
 
     // Real-time sync with Cloud (Firebase)
