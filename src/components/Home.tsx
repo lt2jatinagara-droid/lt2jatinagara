@@ -623,34 +623,34 @@ export default function Home() {
           </div>
           <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-md">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
+              <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
-                  <tr className="border-b border-white/10 italic text-brand-primary">
-                    <th className="sticky left-0 bg-brand-dark z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-white/10">No</th>
-                    <th className="sticky left-[64px] bg-brand-dark z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-b border-white/10">Nama Regu</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">No Tenda</th>
+                  <tr className="italic text-brand-primary">
+                    <th className="sticky left-0 bg-[#0d0d0d] z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-white/10">No</th>
+                    <th className="sticky left-[64px] bg-[#0d0d0d] z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] max-w-[200px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-b border-white/10">Nama Regu</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-white/10">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap">L-0{i + 1}</th>
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-white/10">L-0{i + 1}</th>
                     ))}
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap">Total Poin</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-white/10">Total Poin</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-white/90">
+                <tbody className="text-white/90">
                   {recap.map((item: any, i: number) => (
                     <tr key={i} className="hover:bg-white/5 transition-colors group">
-                      <td className="sticky left-0 bg-brand-dark group-hover:bg-neutral-900 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px]">
+                      <td className="sticky left-0 bg-[#0d0d0d] group-hover:bg-[#1a1a1a] transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-white/5">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-white/10 text-white mx-auto text-[10px]">
                           {i + 1}
                         </div>
                       </td>
-                      <td className="sticky left-[64px] bg-brand-dark group-hover:bg-neutral-900 transition-colors z-20 px-4 py-3 font-black uppercase tracking-tight text-[12px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] min-w-[200px] max-w-[200px] truncate">
-                        <span className={i === 0 ? "text-brand-primary" : ""}>{item.team}</span>
+                      <td className="sticky left-[64px] bg-[#0d0d0d] group-hover:bg-[#1a1a1a] transition-colors z-20 px-4 py-3 font-black uppercase tracking-tight text-[12px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] min-w-[200px] max-w-[200px] truncate border-b border-white/5">
+                        <span className="text-white">{item.team}</span>
                       </td>
-                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic">{item.tent_no}</td>
+                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-white/5">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-white/5">{score}</td>
                       ))}
-                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary">
+                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-white/5">
                         {item.total}
                       </td>
                     </tr>

@@ -215,40 +215,12 @@ export default function Admin() {
           </div>
           <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 italic">Admin Portal</h2>
           <p className="text-xs text-brand-muted font-bold uppercase tracking-widest mb-10 leading-relaxed italic">
-            Masukkan password keamanan untuk mengelola data LT 2 Kwarran Jatinagara
+            Silakan masuk menggunakan Google Login untuk mengelola data LT 2 Kwarran Jatinagara
           </p>
-
-          <input
-            type="password"
-            placeholder="password"
-            className="w-full p-5 rounded-2xl border-2 border-brand-border mb-4 font-bold text-center bg-brand-surface focus:border-brand-primary transition-all outline-none text-lg"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (password === "admin123" ? setIsLoggedIn(true) : setMessage("❌ Password Salah!"))}
-          />
-          
-          <button
-            onClick={() => {
-              if (password === "admin123") {
-                setIsLoggedIn(true);
-                setMessage("✅ Login berhasil (Mode Lokal)");
-              } else {
-                setMessage("❌ Password salah (Gunakan: admin123)");
-              }
-            }}
-            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[11px] shadow-xl active:scale-95 mb-8"
-          >
-            Masuk Sekarang
-          </button>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-border"></div></div>
-            <div className="relative text-[8px] font-black text-brand-muted uppercase bg-white px-4">Atau Gunakan Akun Google</div>
-          </div>
 
           <button
             onClick={handleLogin}
-            className="w-full border-2 border-brand-border text-brand-dark font-black p-4 rounded-2xl hover:bg-brand-surface transition-all uppercase tracking-widest text-[9px] flex items-center justify-center gap-3 active:scale-95"
+            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 active:scale-95 shadow-xl"
           >
             Google Login
           </button>
@@ -683,24 +655,24 @@ export default function Admin() {
         <section className="bg-white p-6 md:p-10 rounded-[40px] border border-brand-border shadow-xl overflow-hidden">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 italic text-brand-primary">Pengaturan Skor & Rekapitulasi</h2>
           <div className="overflow-x-auto -mx-6 px-6">
-            <table className="w-full text-left border-collapse min-w-[2000px] select-none text-[12px]">
+            <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none text-[12px]">
               <thead>
-                <tr className="border-b border-brand-border/10">
-                  <th className="sticky left-0 bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px]">No</th>
-                  <th className="sticky left-[48px] bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] min-w-[180px]">Nama Regu</th>
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted">No Tenda</th>
+                <tr>
+                  <th className="sticky left-0 bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b border-brand-border/10">No</th>
+                  <th className="sticky left-[48px] bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] border-b border-brand-border/10 min-w-[180px]">Nama Regu</th>
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b border-brand-border/10">No Tenda</th>
                   {Array.from({ length: 20 }).map((_, i) => (
-                    <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center">Lomba {i + 1}</th>
+                    <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b border-brand-border/10">Lomba {i + 1}</th>
                   ))}
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right">Total</th>
-                  <th className="py-4 px-4 text-right"></th>
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b border-brand-border/10">Total</th>
+                  <th className="py-4 px-4 text-right border-b border-brand-border/10"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-brand-surface">
+              <tbody>
                 {data.recap.map((item: any, i: number) => (
                   <tr key={i} className="hover:bg-brand-surface/50 transition-colors group">
-                    <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 text-center w-[48px] font-black text-brand-muted/40 text-[10px]">{i + 1}</td>
-                    <td className="sticky left-[48px] bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] min-w-[180px] max-w-[180px] truncate">
+                    <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 text-center w-[48px] font-black text-brand-muted/40 text-[10px] border-b border-brand-border/10">{i + 1}</td>
+                    <td className="sticky left-[48px] bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] min-w-[180px] max-w-[180px] truncate border-b border-brand-border/10">
                       <input
                         className="w-full bg-transparent font-black uppercase tracking-tight text-[12px] text-brand-dark focus:outline-none"
                         value={item.team}
@@ -711,7 +683,7 @@ export default function Admin() {
                         }}
                       />
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 border-b border-brand-border/10">
                       <input
                         className="w-20 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-[11px] focus:outline-none"
                         value={item.tent_no}
@@ -723,7 +695,7 @@ export default function Admin() {
                       />
                     </td>
                     {Array.from({ length: 20 }).map((_, sIdx) => (
-                      <td key={sIdx} className="py-2 px-1">
+                      <td key={sIdx} className="py-2 px-1 border-b border-brand-border/10">
                         <input
                           type="number"
                           className="w-14 bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
@@ -739,10 +711,10 @@ export default function Admin() {
                         />
                       </td>
                     ))}
-                    <td className="py-4 px-4 text-right">
+                    <td className="py-4 px-4 text-right border-b border-brand-border/10">
                       <span className="font-black text-[14px] tracking-tighter text-brand-primary">{item.total}</span>
                     </td>
-                    <td className="py-4 px-4 text-right">
+                    <td className="py-4 px-4 text-right border-b border-brand-border/10">
                       <button
                         onClick={() => {
                           const newRecap = [...data.recap];
