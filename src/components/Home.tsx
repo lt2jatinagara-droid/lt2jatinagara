@@ -40,6 +40,23 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const mergeWithFallback = (incomingData: any) => {
+    if (!incomingData) return rawFallbackData;
+    return {
+      ...rawFallbackData,
+      ...incomingData,
+      settings: {
+        ...rawFallbackData.settings,
+        ...(incomingData.settings || {})
+      },
+      slides: incomingData.slides && incomingData.slides.length > 0 ? incomingData.slides : rawFallbackData.slides,
+      schedule: incomingData.schedule && incomingData.schedule.length > 0 ? incomingData.schedule : rawFallbackData.schedule,
+      news: incomingData.news && incomingData.news.length > 0 ? incomingData.news : rawFallbackData.news,
+      recap: incomingData.recap && incomingData.recap.length > 0 ? incomingData.recap : rawFallbackData.recap,
+      documents: incomingData.documents && incomingData.documents.length > 0 ? incomingData.documents : rawFallbackData.documents
+    };
+  };
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
@@ -51,7 +68,7 @@ export default function Home() {
         return res.json();
       })
       .then(data => {
-        setSiteData(data);
+        setSiteData(mergeWithFallback(data));
         setLoading(false);
       })
       .catch(err => {
@@ -63,7 +80,8 @@ export default function Home() {
     // Real-time sync with Cloud (Firebase)
     const unsubscribe = onSnapshot(doc(db, "settings", "site"), (docSnap) => {
       if (docSnap.exists()) {
-        setSiteData(docSnap.data());
+        const cloudData = docSnap.data();
+        setSiteData(mergeWithFallback(cloudData));
         setLoading(false);
       }
     }, (error) => {
@@ -305,15 +323,8 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="z-10 text-white max-w-5xl"
           >
-            <div className="inline-block bg-brand-primary text-white text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-8 italic shadow-xl">
-              {slides[currentSlide]?.desc}
-            </div>
-            <h1 className="text-4xl md:text-7xl font-black mb-8 leading-tight tracking-tighter uppercase">
-              {slides[currentSlide]?.title}<br />
-              <span className="text-brand-primary">TINGKAT II</span>
-            </h1>
             <p className="text-lg md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
-              Lomba Pramuka Penggalang Kwartir Ranting Jatinagara {settings.year}. Ajang kompetisi paling bergengsi tahun ini!
+              {slides[currentSlide]?.desc || `Lomba Pramuka Penggalang Kwartir Ranting Jatinagara ${settings.year}. Ajang kompetisi paling bergengsi tahun ini!`}
             </p>
             <div className="flex flex-col sm:flex-row gap-5 justify-center">
               <a href="#jadwal" className="bg-brand-primary hover:bg-red-700 text-white font-bold px-10 py-5 rounded-full uppercase tracking-widest text-xs transition-all transform hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-2">

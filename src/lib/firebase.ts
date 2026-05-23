@@ -16,7 +16,43 @@ const config = {
 };
 
 const app = initializeApp(config);
-export const db = getFirestore(app, metaEnv.VITE_FIREBASE_DATABASE_ID || firebaseConfig.firestoreDatabaseId); 
+
+// Retrieve and sanitize the Database ID to prevent Realtime Database URL misconfiguration
+let rawDatabaseId = metaEnv.VITE_FIREBASE_DATABASE_ID || firebaseConfig.firestoreDatabaseId || "(default)";
+
+if (typeof rawDatabaseId !== 'string') {
+  rawDatabaseId = "(default)";
+}
+
+let databaseId = rawDatabaseId.trim();
+
+// Check for URLs or invalid characters (slashes, colons, protocols, dots, etc.)
+if (
+  databaseId.includes('://') || 
+  databaseId.includes('.') || 
+  databaseId.includes('/') || 
+  databaseId.startsWith('http')
+) {
+  console.warn("Detected invalid/URL-like Firebase Database ID:", databaseId);
+  // Fallback to the authentic database ID from config if it's clean, otherwise default to "(default)"
+  const cleanConfigId = firebaseConfig.firestoreDatabaseId;
+  if (cleanConfigId && !cleanConfigId.includes('/') && !cleanConfigId.includes('.')) {
+    databaseId = cleanConfigId;
+  } else {
+    databaseId = "(default)";
+  }
+}
+
+// Extra check: must only contain valid characters
+const validDbIdRegex = /^[a-z0-9-_()]+$/i;
+if (!validDbIdRegex.test(databaseId)) {
+  console.warn("Database ID does not match valid Firestore identifier format. Defaulting to (default).");
+  databaseId = "(default)";
+}
+
+// Initialize with standard getFirestore to prevent IndexedDB Transaction failures in restricted sandbox iframes
+export const db = getFirestore(app, databaseId);
+
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 

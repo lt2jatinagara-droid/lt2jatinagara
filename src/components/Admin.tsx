@@ -71,10 +71,24 @@ export default function Admin() {
   };
 
   const setSanitizedData = (newData: any) => {
-    if (newData && newData.recap) {
-      newData.recap = ensure32Teams(newData.recap);
+    if (!newData) {
+      setData(rawFallbackData);
+      return;
     }
-    setData(newData);
+    const merged = {
+      ...rawFallbackData,
+      ...newData,
+      settings: {
+        ...rawFallbackData.settings,
+        ...(newData.settings || {})
+      },
+      slides: newData.slides && newData.slides.length > 0 ? newData.slides : rawFallbackData.slides,
+      schedule: newData.schedule && newData.schedule.length > 0 ? newData.schedule : rawFallbackData.schedule,
+      news: newData.news && newData.news.length > 0 ? newData.news : rawFallbackData.news,
+      recap: ensure32Teams(newData.recap || rawFallbackData.recap),
+      documents: newData.documents && newData.documents.length > 0 ? newData.documents : rawFallbackData.documents
+    };
+    setData(merged);
   };
 
   useEffect(() => {
@@ -135,8 +149,12 @@ export default function Admin() {
         loadFromLocalApi();
       }
       setLoading(false);
-    } catch (e) {
-      console.error("Firestore error:", e);
+    } catch (e: any) {
+      if (e?.message?.includes("offline") || e?.code === "unavailable") {
+        console.warn("Firestore is offline/unavailable. Falling back to local data.json config.", e.message);
+      } else {
+        console.error("Firestore error:", e);
+      }
       loadFromLocalApi();
     }
   };
