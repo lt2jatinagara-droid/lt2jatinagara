@@ -225,6 +225,28 @@ export default function Admin() {
             Google Login
           </button>
 
+          {/* Vercel Connection Guidelines */}
+          <div className="mt-8 text-left bg-slate-50 border border-brand-border rounded-3xl p-5">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-brand-primary mb-3">💡 INTEGRASI VERCEL & GOOGLE SIGN-IN</h3>
+            <p className="text-[10px] text-slate-500 font-bold mb-3 leading-relaxed">
+              Agar Google Login dapat memverifikasi email <span className="text-brand-primary select-all">lt2jatinagara@gmail.com</span> di domain Vercel Anda, lakukan langkah mudah berikut:
+            </p>
+            <ol className="list-decimal list-outside ml-4 text-[10px] font-bold text-slate-600 space-y-2 leading-relaxed">
+              <li>
+                Buka <a href="https://console.firebase.google.com" target="_blank" rel="no-referrer" className="text-brand-primary underline hover:text-brand-dark font-black">Firebase Console</a> lalu masuk ke proyek Anda.
+              </li>
+              <li>
+                Pilih menu <strong className="text-slate-800">Authentication</strong> di bilah samping, lalu klik tab <strong className="text-slate-800">Settings</strong>.
+              </li>
+              <li>
+                Di kolom <strong className="text-slate-800">Authorized domains</strong>, klik tombol <strong className="text-brand-primary font-black">+ Add domain</strong>.
+              </li>
+              <li>
+                Masukkan alamat domain deployment Vercel Anda (contoh: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-black font-mono">nama-proyek-anda.vercel.app</code>) lalu klik Simpan.
+              </li>
+            </ol>
+          </div>
+
           {message && <p className="mt-8 text-center text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] italic bg-brand-primary/5 p-3 rounded-xl">{message}</p>}
           <Link to="/" className="block text-center mt-10 text-[9px] font-black text-brand-muted uppercase tracking-[0.3em] hover:text-brand-dark transition-all italic">
             ← Kembali ke Beranda
