@@ -27,11 +27,20 @@ export default function Admin() {
     }
 
     const unsubscribe = onAuthStateChanged(auth, (u: any) => {
-      setUser(u);
       if (u) {
-        setIsLoggedIn(true);
-        setIsUsingFirebase(true);
-        loadFromFirestore();
+        if (u.email === "lt2jatinagara@gmail.com") {
+          setUser(u);
+          setIsLoggedIn(true);
+          setIsUsingFirebase(true);
+          loadFromFirestore();
+        } else {
+          signOut(auth).then(() => {
+            setUser(null);
+            setIsLoggedIn(false);
+            setIsUsingFirebase(false);
+            setMessage("❌ Akses ditolak: Hanya email lt2jatinagara@gmail.com yang diizinkan!");
+          });
+        }
       } else {
         loadFromLocalApi();
       }
@@ -84,7 +93,12 @@ export default function Admin() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (result) {
-        setMessage("Login berhasil!");
+        if (result.user.email === "lt2jatinagara@gmail.com") {
+          setMessage("Login berhasil!");
+        } else {
+          await signOut(auth);
+          setMessage("❌ Akses ditolak: Email Anda tidak diizinkan!");
+        }
       } else {
         setMessage("⚠️ Firebase belum dikonfigurasi. Gunakan mode password.");
       }
