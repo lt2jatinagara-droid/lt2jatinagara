@@ -88,7 +88,62 @@ export default function Home() {
 
   if (loading || !siteData) return <div className="min-h-screen bg-brand-surface flex items-center justify-center font-bold uppercase tracking-widest text-brand-muted">Loading...</div>;
 
-  const { schedule, recap, settings, slides = [], news = [] } = siteData;
+  const { schedule, recap: rawRecap, settings, slides = [], news = [] } = siteData;
+
+  // Ensure exactly 32 teams are always returned and configured
+  const ensure32Teams = (recapList: any[]): any[] => {
+    const list = recapList || [];
+    const defaultTeams = [
+      { team: "Regu Garuda (Putra)", tent_no: "PA-01" },
+      { team: "Regu Melati (Putri)", tent_no: "PI-01" },
+      { team: "Regu Elang (Putra)", tent_no: "PA-02" },
+      { team: "Regu Mawar (Putri)", tent_no: "PI-02" },
+      { team: "Regu Rajawali (Putra)", tent_no: "PA-03" },
+      { team: "Regu Dahlia (Putri)", tent_no: "PI-03" },
+      { team: "Regu Harimau (Putra)", tent_no: "PA-04" },
+      { team: "Regu Anggrek (Putri)", tent_no: "PI-04" },
+      { team: "Regu Singa (Putra)", tent_no: "PA-05" },
+      { team: "Regu Tulip (Putri)", tent_no: "PI-05" },
+      { team: "Regu Beruang (Putra)", tent_no: "PA-06" },
+      { team: "Regu Sakura (Putri)", tent_no: "PI-06" },
+      { team: "Regu Banteng (Putra)", tent_no: "PA-07" },
+      { team: "Regu Teratai (Putri)", tent_no: "PI-07" },
+      { team: "Regu Kobra (Putra)", tent_no: "PA-08" },
+      { team: "Regu Lavender (Putri)", tent_no: "PI-08" },
+      { team: "Regu Scorpion (Putra)", tent_no: "PA-09" },
+      { team: "Regu Lily (Putri)", tent_no: "PI-09" },
+      { team: "Regu Kancil (Putra)", tent_no: "PA-10" },
+      { team: "Regu Aster (Putri)", tent_no: "PI-10" },
+      { team: "Regu Kelelawar (Putra)", tent_no: "PA-11" },
+      { team: "Regu Kenanga (Putri)", tent_no: "PI-11" },
+      { team: "Regu Serigala (Putra)", tent_no: "PA-12" },
+      { team: "Regu Kamboja (Putri)", tent_no: "PI-12" },
+      { team: "Regu Hiu (Putra)", tent_no: "PA-13" },
+      { team: "Regu Bougenville (Putri)", tent_no: "PI-13" },
+      { team: "Regu Lumba (Putra)", tent_no: "PA-14" },
+      { team: "Regu Flamboyan (Putri)", tent_no: "PI-14" },
+      { team: "Regu Rusa (Putra)", tent_no: "PA-15" },
+      { team: "Regu Edelweis (Putri)", tent_no: "PI-15" },
+      { team: "Regu Singa Emas (Putra)", tent_no: "PA-16" },
+      { team: "Regu Matahari (Putri)", tent_no: "PI-16" }
+    ];
+
+    const result = [...list];
+    while (result.length < 32) {
+      const idx = result.length;
+      result.push({
+        rank: idx + 1,
+        team: defaultTeams[idx]?.team || `Regu ${idx + 1}`,
+        tent_no: defaultTeams[idx]?.tent_no || `-`,
+        scores: Array(20).fill(0),
+        total: 0
+      });
+    }
+    return result.slice(0, 32);
+  };
+
+  const recap = ensure32Teams(rawRecap);
+  const tableFontSize = Number(settings?.table_font_size || "12");
 
   const COMPETITIONS = [
     { id: 1, name: "Pionering", icon: <Tent className="w-6 h-6" />, desc: "Ketangkasan membuat bangunan darurat menggunakan tali dan tongkat." },
@@ -568,32 +623,34 @@ export default function Home() {
           </div>
           <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-md">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[2000px]">
+              <table className="w-full text-left border-collapse min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
                   <tr className="border-b border-white/10 italic text-brand-primary">
-                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">No</th>
-                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest min-w-[250px]">Nama Regu</th>
-                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">No Tenda</th>
+                    <th className="sticky left-0 bg-brand-dark z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-white/10">No</th>
+                    <th className="sticky left-[64px] bg-brand-dark z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-b border-white/10">Nama Regu</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap">L-0{i + 1}</th>
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap">L-0{i + 1}</th>
                     ))}
-                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap">Total Poin</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap">Total Poin</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5 text-white/90">
                   {recap.map((item: any, i: number) => (
                     <tr key={i} className="hover:bg-white/5 transition-colors group">
-                      <td className="px-8 py-6">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-black ${i === 0 ? "bg-brand-primary text-white scale-110 shadow-lg shadow-brand-primary/20" : "bg-white/10 text-white"}`}>
+                      <td className="sticky left-0 bg-brand-dark group-hover:bg-neutral-900 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px]">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-white/10 text-white mx-auto text-[10px]">
                           {i + 1}
                         </div>
                       </td>
-                      <td className="px-8 py-6 font-black uppercase tracking-tight text-xl">{item.team}</td>
-                      <td className="px-8 py-6 text-brand-muted font-bold uppercase text-[11px] tracking-widest italic">{item.tent_no}</td>
+                      <td className="sticky left-[64px] bg-brand-dark group-hover:bg-neutral-900 transition-colors z-20 px-4 py-3 font-black uppercase tracking-tight text-[12px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] min-w-[200px] max-w-[200px] truncate">
+                        <span className={i === 0 ? "text-brand-primary" : ""}>{item.team}</span>
+                      </td>
+                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-4 py-6 text-center text-brand-muted font-bold text-sm">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs">{score}</td>
                       ))}
-                      <td className="px-8 py-6 text-right font-black text-2xl tracking-tighter text-brand-primary">
+                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary">
                         {item.total}
                       </td>
                     </tr>

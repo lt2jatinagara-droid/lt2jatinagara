@@ -19,6 +19,64 @@ export default function Admin() {
   const [message, setMessage] = useState("");
   const [isUsingFirebase, setIsUsingFirebase] = useState(false);
 
+  const ensure32Teams = (recapList: any[]): any[] => {
+    const list = recapList || [];
+    const defaultTeams = [
+      { team: "Regu Garuda (Putra)", tent_no: "PA-01" },
+      { team: "Regu Melati (Putri)", tent_no: "PI-01" },
+      { team: "Regu Elang (Putra)", tent_no: "PA-02" },
+      { team: "Regu Mawar (Putri)", tent_no: "PI-02" },
+      { team: "Regu Rajawali (Putra)", tent_no: "PA-03" },
+      { team: "Regu Dahlia (Putri)", tent_no: "PI-03" },
+      { team: "Regu Harimau (Putra)", tent_no: "PA-04" },
+      { team: "Regu Anggrek (Putri)", tent_no: "PI-04" },
+      { team: "Regu Singa (Putra)", tent_no: "PA-05" },
+      { team: "Regu Tulip (Putri)", tent_no: "PI-05" },
+      { team: "Regu Beruang (Putra)", tent_no: "PA-06" },
+      { team: "Regu Sakura (Putri)", tent_no: "PI-06" },
+      { team: "Regu Banteng (Putra)", tent_no: "PA-07" },
+      { team: "Regu Teratai (Putri)", tent_no: "PI-07" },
+      { team: "Regu Kobra (Putra)", tent_no: "PA-08" },
+      { team: "Regu Lavender (Putri)", tent_no: "PI-08" },
+      { team: "Regu Scorpion (Putra)", tent_no: "PA-09" },
+      { team: "Regu Lily (Putri)", tent_no: "PI-09" },
+      { team: "Regu Kancil (Putra)", tent_no: "PA-10" },
+      { team: "Regu Aster (Putri)", tent_no: "PI-10" },
+      { team: "Regu Kelelawar (Putra)", tent_no: "PA-11" },
+      { team: "Regu Kenanga (Putri)", tent_no: "PI-11" },
+      { team: "Regu Serigala (Putra)", tent_no: "PA-12" },
+      { team: "Regu Kamboja (Putri)", tent_no: "PI-12" },
+      { team: "Regu Hiu (Putra)", tent_no: "PA-13" },
+      { team: "Regu Bougenville (Putri)", tent_no: "PI-13" },
+      { team: "Regu Lumba (Putra)", tent_no: "PA-14" },
+      { team: "Regu Flamboyan (Putri)", tent_no: "PI-14" },
+      { team: "Regu Rusa (Putra)", tent_no: "PA-15" },
+      { team: "Regu Edelweis (Putri)", tent_no: "PI-15" },
+      { team: "Regu Singa Emas (Putra)", tent_no: "PA-16" },
+      { team: "Regu Matahari (Putri)", tent_no: "PI-16" }
+    ];
+
+    const result = [...list];
+    while (result.length < 32) {
+      const idx = result.length;
+      result.push({
+        rank: idx + 1,
+        team: defaultTeams[idx]?.team || `Regu ${idx + 1}`,
+        tent_no: defaultTeams[idx]?.tent_no || `-`,
+        scores: Array(20).fill(0),
+        total: 0
+      });
+    }
+    return result.slice(0, 32);
+  };
+
+  const setSanitizedData = (newData: any) => {
+    if (newData && newData.recap) {
+      newData.recap = ensure32Teams(newData.recap);
+    }
+    setData(newData);
+  };
+
   useEffect(() => {
     // If Firebase is not configured, immediately fall back to local API to avoid infinite loading
     if (!auth || !auth.onAuthStateChanged) {
@@ -57,12 +115,12 @@ export default function Admin() {
         return res.json();
       })
       .then((d) => {
-        setData(d);
+        setSanitizedData(d);
         setLoading(false);
       })
       .catch(() => {
         console.warn("Local API/Vercel offline. Using client-side data.json configuration.");
-        setData(rawFallbackData);
+        setSanitizedData(rawFallbackData);
         setLoading(false);
       });
   };
@@ -71,7 +129,7 @@ export default function Admin() {
     try {
       const siteDoc = await getDoc(doc(db, "settings", "site"));
       if (siteDoc.exists()) {
-        setData(siteDoc.data());
+        setSanitizedData(siteDoc.data());
       } else {
         // If not in firestore yet, try local API or default
         loadFromLocalApi();
@@ -270,6 +328,20 @@ export default function Admin() {
                 value={data.settings.location_name}
                 onChange={(e) => setData({ ...data, settings: { ...data.settings, location_name: e.target.value } })}
               />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-brand-muted mb-3">Ukuran Font Tabel Rekapitulasi Lomba (10 - 16px)</label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="10"
+                  max="16"
+                  className="w-full h-2 bg-brand-border rounded-lg appearance-none cursor-pointer accent-brand-primary"
+                  value={data.settings.table_font_size || "12"}
+                  onChange={(e) => setData({ ...data, settings: { ...data.settings, table_font_size: e.target.value } })}
+                />
+                <span className="font-mono bg-brand-surface border border-brand-border px-4 py-2 rounded-xl text-xs font-bold text-brand-primary whitespace-nowrap">{data.settings.table_font_size || "12"}px</span>
+              </div>
             </div>
           </div>
         </section>
@@ -611,11 +683,11 @@ export default function Admin() {
         <section className="bg-white p-6 md:p-10 rounded-[40px] border border-brand-border shadow-xl overflow-hidden">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 italic text-brand-primary">Pengaturan Skor & Rekapitulasi</h2>
           <div className="overflow-x-auto -mx-6 px-6">
-            <table className="w-full text-left border-collapse min-w-[2000px]">
+            <table className="w-full text-left border-collapse min-w-[2000px] select-none text-[12px]">
               <thead>
                 <tr className="border-b border-brand-border/10">
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted">No</th>
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted min-w-[200px]">Nama Regu</th>
+                  <th className="sticky left-0 bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px]">No</th>
+                  <th className="sticky left-[48px] bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] min-w-[180px]">Nama Regu</th>
                   <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted">No Tenda</th>
                   {Array.from({ length: 20 }).map((_, i) => (
                     <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center">Lomba {i + 1}</th>
@@ -627,10 +699,10 @@ export default function Admin() {
               <tbody className="divide-y divide-brand-surface">
                 {data.recap.map((item: any, i: number) => (
                   <tr key={i} className="hover:bg-brand-surface/50 transition-colors group">
-                    <td className="py-4 px-4 font-black text-brand-muted/30">{i + 1}</td>
-                    <td className="py-4 px-4">
+                    <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 text-center w-[48px] font-black text-brand-muted/40 text-[10px]">{i + 1}</td>
+                    <td className="sticky left-[48px] bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] min-w-[180px] max-w-[180px] truncate">
                       <input
-                        className="w-full bg-transparent font-black uppercase tracking-tight"
+                        className="w-full bg-transparent font-black uppercase tracking-tight text-[12px] text-brand-dark focus:outline-none"
                         value={item.team}
                         onChange={(e) => {
                           const newRecap = [...data.recap];
@@ -641,7 +713,7 @@ export default function Admin() {
                     </td>
                     <td className="py-4 px-4">
                       <input
-                        className="w-24 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-xs"
+                        className="w-20 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-[11px] focus:outline-none"
                         value={item.tent_no}
                         onChange={(e) => {
                           const newRecap = [...data.recap];
@@ -651,10 +723,10 @@ export default function Admin() {
                       />
                     </td>
                     {Array.from({ length: 20 }).map((_, sIdx) => (
-                      <td key={sIdx} className="py-4 px-1">
+                      <td key={sIdx} className="py-2 px-1">
                         <input
                           type="number"
-                          className="w-16 bg-white border border-brand-border/10 p-2 rounded-lg text-center font-bold text-xs focus:border-brand-primary outline-none transition-colors"
+                          className="w-14 bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
                           value={item.scores[sIdx] || 0}
                           onChange={(e) => {
                             const newRecap = [...data.recap];
@@ -668,7 +740,7 @@ export default function Admin() {
                       </td>
                     ))}
                     <td className="py-4 px-4 text-right">
-                      <span className="font-black text-lg tracking-tighter text-brand-primary">{item.total}</span>
+                      <span className="font-black text-[14px] tracking-tighter text-brand-primary">{item.total}</span>
                     </td>
                     <td className="py-4 px-4 text-right">
                       <button
@@ -677,7 +749,7 @@ export default function Admin() {
                           newRecap.splice(i, 1);
                           setData({ ...data, recap: newRecap });
                         }}
-                        className="p-2 text-slate-200 hover:text-brand-primary transition-colors"
+                        className="p-2 text-slate-300 hover:text-brand-primary transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

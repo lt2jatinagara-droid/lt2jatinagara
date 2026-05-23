@@ -37,20 +37,38 @@
     { "id": 4, "name": "Pentas Seni", "desc": "Menampilkan bakat seni budaya dari masing-masing regu." }
   ],
   "recap": [
-    { 
-      "rank": 1, 
-      "team": "Regu Garuda", 
-      "tent_no": "A-01",
-      "scores": [100, 95, 90, 85, 100, 90, 80, 95, 100, 90, 85, 90, 100, 95, 90, 85, 100, 90, 80, 95],
-      "total": 1855
-    },
-    { 
-      "rank": 2, 
-      "team": "Regu Melati", 
-      "tent_no": "B-04",
-      "scores": [90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80],
-      "total": 1810
-    }
+    { "rank": 1, "team": "Regu Garuda (Putra)", "tent_no": "PA-01", "scores": [95, 90, 85, 90, 95, 90, 85, 90, 100, 95, 90, 85, 90, 100, 95, 90, 85, 100, 90, 95], "total": 1820 },
+    { "rank": 2, "team": "Regu Melati (Putri)", "tent_no": "PI-01", "scores": [90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80, 95, 85, 90, 100, 90, 90, 95, 80], "total": 1810 },
+    { "rank": 3, "team": "Regu Elang (Putra)", "tent_no": "PA-02", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 4, "team": "Regu Mawar (Putri)", "tent_no": "PI-02", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 5, "team": "Regu Rajawali (Putra)", "tent_no": "PA-03", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 6, "team": "Regu Dahlia (Putri)", "tent_no": "PI-03", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 7, "team": "Regu Harimau (Putra)", "tent_no": "PA-04", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 8, "team": "Regu Anggrek (Putri)", "tent_no": "PI-04", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 9, "team": "Regu Singa (Putra)", "tent_no": "PA-05", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 10, "team": "Regu Tulip (Putri)", "tent_no": "PI-05", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 11, "team": "Regu Beruang (Putra)", "tent_no": "PA-06", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 12, "team": "Regu Sakura (Putri)", "tent_no": "PI-06", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 13, "team": "Regu Banteng (Putra)", "tent_no": "PA-07", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 14, "team": "Regu Teratai (Putri)", "tent_no": "PI-07", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 15, "team": "Regu Kobra (Putra)", "tent_no": "PA-08", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 16, "team": "Regu Lavender (Putri)", "tent_no": "PI-08", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 17, "team": "Regu Scorpion (Putra)", "tent_no": "PA-09", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 18, "team": "Regu Lily (Putri)", "tent_no": "PI-09", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 19, "team": "Regu Kancil (Putra)", "tent_no": "PA-10", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 20, "team": "Regu Aster (Putri)", "tent_no": "PI-10", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 21, "team": "Regu Kelelawar (Putra)", "tent_no": "PA-11", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 22, "team": "Regu Kenanga (Putri)", "tent_no": "PI-11", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 23, "team": "Regu Serigala (Putra)", "tent_no": "PA-12", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 24, "team": "Regu Kamboja (Putri)", "tent_no": "PI-12", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 25, "team": "Regu Hiu (Putra)", "tent_no": "PA-13", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 26, "team": "Regu Bougenville (Putri)", "tent_no": "PI-13", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 27, "team": "Regu Lumba (Putra)", "tent_no": "PA-14", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 28, "team": "Regu Flamboyan (Putri)", "tent_no": "PI-14", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 29, "team": "Regu Rusa (Putra)", "tent_no": "PA-15", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 30, "team": "Regu Edelweis (Putri)", "tent_no": "PI-15", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 31, "team": "Regu Singa Emas (Putra)", "tent_no": "PA-16", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 },
+    { "rank": 32, "team": "Regu Matahari (Putri)", "tent_no": "PI-16", "scores": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], "total": 0 }
   ],
   "announcements": [],
   "slides": [
@@ -88,7 +106,8 @@
     "title": "LT 2 Kwarran Jatinagara",
     "year": "2026",
     "location_name": "Bumi Perkemahan Jatinagara",
-    "location_address": "Jl. Raya Jatinagara No. 45, Ciamis, Jawa Barat."
+    "location_address": "Jl. Raya Jatinagara No. 45, Ciamis, Jawa Barat.",
+    "table_font_size": "12"
   },
   "documents": [
     { "title": "Petunjuk Teknis LT 2", "type": "PDF", "size": "2.4 MB", "url": "https://example.com/petunjuk-teknis" },
