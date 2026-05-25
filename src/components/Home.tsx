@@ -235,7 +235,7 @@ export default function Home() {
   const SOCIAL_PLATFORMS = [
     { name: "Instagram", icon: <Instagram className="w-6 h-6" />, handle: "@pramukajatinagara_", url: "https://instagram.com/pramukajatinagara_", color: "bg-pink-600" },
     { name: "YouTube", icon: <Youtube className="w-6 h-6" />, handle: "Pramuka Jatinagara", url: "https://youtube.com/@pramukajatinagara", color: "bg-red-600" },
-    { name: "WhatsApp", icon: <MessageCircle className="w-6 h-6" />, handle: "Official Admin", url: "https://wa.me/6281234567890", color: "bg-green-600" },
+    { name: "WhatsApp", icon: <MessageCircle className="w-6 h-6" />, handle: "Official Admin", url: "https://wa.me/6285316377589", color: "bg-green-600" },
     { name: "Facebook", icon: <Facebook className="w-6 h-6" />, handle: "Kwarran Jatinagara", url: "https://facebook.com/kwarran.jatinagara", color: "bg-blue-600" },
   ];
 
@@ -272,7 +272,7 @@ export default function Home() {
           </div>
           
           <div className="hidden md:flex gap-6 text-xs font-bold uppercase tracking-wider">
-            {["Beranda", "Tentang", "Berita", "Jadwal", "Lomba", "Denah", "Rekap", "Dokumen", "Lokasi"].map((item) => (
+            {["Beranda", "Tentang", "Berita", "Jadwal", "Rekap", "Dokumen", "Lokasi"].map((item) => (
               <a 
                 key={item} 
                 href={`#${item.toLowerCase()}`}
@@ -335,7 +335,7 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="absolute top-full left-0 w-full bg-white shadow-xl p-6 md:hidden flex flex-col gap-4"
             >
-              {["Beranda", "Tentang", "Berita", "Jadwal", "Lomba", "Denah", "Rekap", "Dokumen", "Lokasi"].map((item) => (
+              {["Beranda", "Tentang", "Berita", "Jadwal", "Rekap", "Dokumen", "Lokasi"].map((item) => (
                 <a 
                   key={item} 
                   href={`#${item.toLowerCase()}`}
@@ -589,32 +589,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Lomba Section */}
-      <section id="lomba" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-black mb-4 tracking-tighter uppercase">Kompetisi Utama</h2>
-          <p className="text-[11px] font-bold text-brand-primary uppercase tracking-[0.3em] mb-20 italic">Ajang Pembuktian Kualitas Regu Penggalang</p>
-          <div className="grid md:grid-cols-4 gap-8">
-            {COMPETITIONS.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-brand-surface p-10 rounded-3xl border border-brand-border text-center group hover:bg-black hover:border-black transition-all duration-500"
-              >
-                <div className="w-16 h-16 bg-white shadow-md text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform">
-                  {item.icon}
-                </div>
-                <h3 className="text-lg font-black uppercase tracking-widest mb-4 group-hover:text-white">{item.name}</h3>
-                <p className="text-xs text-brand-muted group-hover:text-slate-400 leading-relaxed italic">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Schedule Section */}
       <section id="jadwal" className="py-24 bg-brand-surface">
         <div className="max-w-5xl mx-auto px-6">
@@ -670,35 +644,6 @@ export default function Home() {
               ))}
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Denah Section */}
-      <section id="denah" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">Denah Perkemahan</h2>
-              <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Tata Letak Area & Kapling Tenda</p>
-            </div>
-          </div>
-          <div className="bg-brand-surface border border-brand-border rounded-[40px] p-8 md:p-12 relative overflow-hidden group">
-            <div className="aspect-[16/9] w-full bg-white rounded-[24px] border border-brand-border flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
-               {/* Schematic Site Plan Placeholder */}
-               <div className="grid grid-cols-4 grid-rows-3 gap-4 w-full h-full p-8 opacity-20">
-                  {Array.from({length: 12}).map((_, i) => (
-                    <div key={i} className="border border-brand-muted rounded-lg flex items-center justify-center font-bold text-xs uppercase">Blok {String.fromCharCode(65 + i)}</div>
-                  ))}
-               </div>
-               <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center px-6">
-                  <div className="bg-brand-dark text-white p-6 rounded-full mb-6 shadow-2xl group-hover:scale-110 transition-transform">
-                    <Tent className="w-12 h-12" />
-                  </div>
-                  <h3 className="text-2xl font-black uppercase text-black tracking-tighter mb-2 italic">Denah Digital Dalam Proses</h3>
-                  <p className="text-brand-muted max-w-md text-xs font-bold uppercase tracking-widest">Hubungi sekretariat untuk mendapatkan salinan fisik site plan terbaru di lokasi bumi perkemahan.</p>
-               </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -838,42 +783,6 @@ export default function Home() {
       </section>
 
       {/* Location Area */}
-      <section id="platform" className="py-24 bg-brand-surface border-y border-brand-border overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">Platform Resmi</h2>
-              <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Terhubung Melalui Ekosistem Digital Kami</p>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-4 gap-6">
-            {SOCIAL_PLATFORMS.map((platform, i) => (
-              <motion.a
-                key={i}
-                href={platform.url}
-                target="_blank"
-                rel="noreferrer"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white p-8 rounded-[32px] border border-brand-border flex flex-col items-center text-center group hover:bg-black hover:border-black transition-all duration-300 shadow-xl"
-              >
-                <div className={`w-16 h-16 ${platform.color} text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                  {platform.icon}
-                </div>
-                <h4 className="text-lg font-black uppercase text-black group-hover:text-white transition-colors">{platform.name}</h4>
-                <p className="text-xs text-brand-muted font-bold group-hover:text-white/60 transition-colors uppercase mt-1 italic">{platform.handle}</p>
-                <div className="mt-8 text-[10px] font-black text-brand-primary uppercase tracking-widest flex items-center gap-2 group-hover:text-white">
-                  Kunjungi <ExternalLink className="w-3 h-3" />
-                </div>
-              </motion.a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Location Area */}
       <section id="lokasi" className="py-24 bg-white overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -944,7 +853,7 @@ export default function Home() {
             <div>
               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-black mb-8 italic">Navigasi Utama</h4>
               <ul className="space-y-4 text-xs font-bold uppercase tracking-widest text-brand-muted">
-                {["Beranda", "Tentang", "Jadwal", "Lomba"].map(item => (
+                {["Beranda", "Tentang", "Jadwal"].map(item => (
                   <li key={item}><a href={`#${item.toLowerCase()}`} className="hover:text-brand-primary transition-colors">{item}</a></li>
                 ))}
               </ul>
@@ -971,7 +880,7 @@ export default function Home() {
 
       {/* Floating Action Button */}
       <a 
-        href="https://wa.me/6281234567890" 
+        href="https://wa.me/6285316377589" 
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-10 right-10 z-50 bg-green-600 text-white p-5 rounded-full shadow-2xl hover:bg-green-700 hover:scale-110 active:scale-95 transition-all group"
