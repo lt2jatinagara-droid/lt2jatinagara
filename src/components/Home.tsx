@@ -157,18 +157,35 @@ export default function Home() {
         total: 0
       });
     }
-    return result.slice(0, 32);
+
+    // Ensure scores are arrays of numbers and total contains the correct sum
+    return result.slice(0, 32).map(item => {
+      const scores = Array.isArray(item.scores)
+        ? item.scores.map((s: any) => Number(s) || 0)
+        : Array(20).fill(0);
+      const total = scores.reduce((sum: number, val: number) => sum + val, 0);
+      return {
+        ...item,
+        scores,
+        total
+      };
+    });
   };
 
   const recap = ensure32Teams(rawRecap);
-  const recapPutra = recap.filter((item: any) => 
-    item.team.toLowerCase().includes("putra") || 
-    item.tent_no.toUpperCase().startsWith("PA")
-  );
-  const recapPutri = recap.filter((item: any) => 
-    item.team.toLowerCase().includes("putri") || 
-    item.tent_no.toUpperCase().startsWith("PI")
-  );
+  const recapPutra = recap
+    .filter((item: any) => 
+      item.team.toLowerCase().includes("putra") || 
+      item.tent_no.toUpperCase().startsWith("PA")
+    )
+    .sort((a, b) => b.total - a.total);
+
+  const recapPutri = recap
+    .filter((item: any) => 
+      item.team.toLowerCase().includes("putri") || 
+      item.tent_no.toUpperCase().startsWith("PI")
+    )
+    .sort((a, b) => b.total - a.total);
   const tableFontSize = Number(settings?.table_font_size || "12");
 
   const COMPETITIONS = [
