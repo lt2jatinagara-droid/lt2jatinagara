@@ -2,7 +2,7 @@
   "schedule": [
     {
       "day": "Hari 1",
-      "date": "Selasa, 28 Juli 2026",
+      "date": "Selasa, 15 September 2026",
       "events": [
         { "time": "08:00 - 10:00", "name": "Registrasi Peserta", "location": "Gerbang Utama" },
         { "time": "10:00 - 11:30", "name": "Upacara Pembukaan", "location": "Lapangan Utama" },
@@ -13,7 +13,7 @@
     },
     {
       "day": "Hari 2",
-      "date": "Rabu, 29 Juli 2026",
+      "date": "Rabu, 16 September 2026",
       "events": [
         { "time": "08:00 - 12:00", "name": "Jelajah Alam (Wide Game)", "location": "Rute Sekitar Jatinagara" },
         { "time": "13:30 - 16:30", "name": "Lomba PBB & Semaphore", "location": "Lapangan Utama" },
@@ -22,7 +22,7 @@
     },
     {
       "day": "Hari 3",
-      "date": "Kamis, 30 Juli 2026",
+      "date": "Kamis, 17 September 2026",
       "events": [
         { "time": "08:00 - 10:00", "name": "Bakti Masyarakat", "location": "Desa Sekitar" },
         { "time": "10:30 - 12:00", "name": "Upacara Penutupan & Pengumuman", "location": "Lapangan Utama" },

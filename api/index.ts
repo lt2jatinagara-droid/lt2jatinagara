@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 
 const LOCAL_DATA_FILE = path.join(process.cwd(), "data.json");
 const TMP_DATA_FILE = "/tmp/data.json";

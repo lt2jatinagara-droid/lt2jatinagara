@@ -30,36 +30,53 @@ import {
   db, 
 } from "../lib/firebase";
 import rawFallbackData from "../../data.json";
+// @ts-ignore
+import defaultPembinaImage from "../assets/images/pembina_pramuka_1779719747205.png";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDay, setActiveDay] = useState(0);
+  const [localData, setLocalData] = useState<any>(rawFallbackData);
   const [siteData, setSiteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const mergeWithFallback = (incomingData: any) => {
-    if (!incomingData) return rawFallbackData;
+  const mergeWithFallback = (incomingData: any, referenceData: any = rawFallbackData) => {
+    if (!incomingData) return referenceData || rawFallbackData;
+    const ref = referenceData || rawFallbackData;
+
+    // Merge settings properties safely, avoiding overriding valid image/logo values with empty ones
+    const mergedSettings = {
+      ...ref.settings,
+    };
+
+    if (incomingData.settings) {
+      Object.keys(incomingData.settings).forEach((key) => {
+        if (incomingData.settings[key] !== undefined && incomingData.settings[key] !== null && incomingData.settings[key] !== "") {
+          mergedSettings[key] = incomingData.settings[key];
+        }
+      });
+    }
+
     return {
-      ...rawFallbackData,
+      ...ref,
       ...incomingData,
-      settings: {
-        ...rawFallbackData.settings,
-        ...(incomingData.settings || {})
-      },
-      slides: incomingData.slides && incomingData.slides.length > 0 ? incomingData.slides : rawFallbackData.slides,
-      schedule: incomingData.schedule && incomingData.schedule.length > 0 ? incomingData.schedule : rawFallbackData.schedule,
-      news: incomingData.news && incomingData.news.length > 0 ? incomingData.news : rawFallbackData.news,
-      recap: incomingData.recap && incomingData.recap.length > 0 ? incomingData.recap : rawFallbackData.recap,
-      documents: incomingData.documents && incomingData.documents.length > 0 ? incomingData.documents : rawFallbackData.documents
+      settings: mergedSettings,
+      slides: incomingData.slides && incomingData.slides.length > 0 ? incomingData.slides : ref.slides,
+      schedule: incomingData.schedule && incomingData.schedule.length > 0 ? incomingData.schedule : ref.schedule,
+      news: incomingData.news && incomingData.news.length > 0 ? incomingData.news : ref.news,
+      recap: incomingData.recap && incomingData.recap.length > 0 ? incomingData.recap : ref.recap,
+      documents: incomingData.documents && incomingData.documents.length > 0 ? incomingData.documents : ref.documents
     };
   };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
+    
+    let loadedLocal: any = rawFallbackData;
     
     // Initial load from local API
     fetch("/api/data")
@@ -68,12 +85,14 @@ export default function Home() {
         return res.json();
       })
       .then(data => {
-        setSiteData(mergeWithFallback(data));
+        loadedLocal = data;
+        setLocalData(data);
+        setSiteData(mergeWithFallback(data, data));
         setLoading(false);
       })
       .catch(err => {
         console.warn("Local API/Vercel backend offline. Using robust data.json fallback...", err.message);
-        setSiteData(rawFallbackData);
+        setSiteData(mergeWithFallback(null, rawFallbackData));
         setLoading(false);
       });
 
@@ -81,7 +100,7 @@ export default function Home() {
     const unsubscribe = onSnapshot(doc(db, "settings", "site"), (docSnap) => {
       if (docSnap.exists()) {
         const cloudData = docSnap.data();
-        setSiteData(mergeWithFallback(cloudData));
+        setSiteData(mergeWithFallback(cloudData, loadedLocal));
         setLoading(false);
       }
     }, (error) => {
@@ -218,10 +237,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img 
-              src="https://i.imgur.com/3jPMvNa.png" 
+              src={settings?.logo_url || "https://i.imgur.com/3jPMvNa.png"} 
               alt="Logo LT2 Kwarran Jatinagara" 
               className="w-10 h-10 object-contain"
               referrerPolicy="no-referrer"
+              onError={(e: any) => { e.target.src = "https://i.imgur.com/3jPMvNa.png"; }}
             />
             <div>
               <h1 className={`text-sm font-black uppercase tracking-tighter leading-none ${scrolled ? "text-brand-dark" : "text-white"}`}>
@@ -332,6 +352,7 @@ export default function Home() {
                   alt={slides[currentSlide]?.title}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
+                  onError={(e: any) => { e.target.src = "https://picsum.photos/seed/scout1/1920/1080"; }}
                 />
               </motion.div>
             </AnimatePresence>
@@ -453,6 +474,7 @@ export default function Home() {
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       referrerPolicy="no-referrer"
+                      onError={(e: any) => { e.target.src = "https://picsum.photos/seed/news/800/600"; }}
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-brand-primary shadow-lg group-hover:bg-brand-primary group-hover:text-white transition-all">
@@ -479,10 +501,10 @@ export default function Home() {
       {/* Hero Stats */}
       <section className="bg-white border-b border-brand-border py-12 hidden md:block">
         <div className="max-w-7xl mx-auto px-6 flex justify-center gap-12">
-           <div className="flex flex-col items-center">
-              <p className="text-[10px] uppercase font-bold text-brand-muted mb-1 tracking-widest">Tanggal Pelaksanaan</p>
-              <p className="text-black font-black text-2xl tracking-tighter">28 - 30 Juli {settings.year}</p>
-           </div>
+            <div className="flex flex-col items-center">
+               <p className="text-[10px] uppercase font-bold text-brand-muted mb-1 tracking-widest">Tanggal Pelaksanaan</p>
+               <p className="text-black font-black text-2xl tracking-tighter">15 - 17 September {settings.year}</p>
+            </div>
            <div className="w-px h-12 bg-brand-border"></div>
            <div className="flex flex-col items-center">
               <p className="text-[10px] uppercase font-bold text-brand-muted mb-1 tracking-widest">Lokasi Perkemahan</p>
@@ -521,18 +543,28 @@ export default function Home() {
                 </ul>
               </div>
             </motion.div>
-            <motion.div 
+             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative p-4 bg-white rounded-[32px] border border-brand-border shadow-xl"
+              className="relative p-4 bg-white rounded-[32px] border border-brand-border shadow-xl max-w-sm mx-auto w-full"
             >
-              <div className="aspect-square rounded-[24px] overflow-hidden relative z-10">
+              <div className="aspect-[3/4] rounded-[24px] overflow-hidden relative z-10 bg-slate-50">
                 <img 
-                  src="https://images.unsplash.com/photo-1544391219-09419106093f?q=80&w=2072&auto=format&fit=crop" 
-                  alt="Scouts Activity"
-                  className="w-full h-full object-cover"
+                  src={settings?.pembina_image || defaultPembinaImage} 
+                  alt={settings?.pembina_name || "Kak Dadi Supriadi - Pembina"}
+                  className="w-full h-full object-cover object-top"
+                  referrerPolicy="no-referrer"
+                  onError={(e: any) => { e.target.src = defaultPembinaImage; }}
                 />
+              </div>
+              <div className="mt-5 text-center px-2">
+                <h4 className="font-sans font-black uppercase tracking-tight text-brand-primary text-base">
+                  {settings?.pembina_name || "Kak Dadi Supriadi"}
+                </h4>
+                <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest mt-1.5 leading-tight">
+                  {settings?.pembina_title || "Pembina Kwarran Jatinagara / Ka Mabigus"}
+                </p>
               </div>
             </motion.div>
           </div>
@@ -856,8 +888,8 @@ export default function Home() {
             </div>
             <div className="rounded-[40px] overflow-hidden shadow-2xl aspect-[4/5] bg-brand-surface border border-brand-border relative group">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15832.228581729116!2d108.4144372!3d-7.2345678!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6f4f2c00000001%3A0x7d00000000000000!2sJatinagara%2C%20Ciamis%20Regency%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1714197100000!5m2!1sen!2sid" 
-                className="w-full h-full border-0 grayscale group-hover:grayscale-0 transition-all duration-1000" 
+                src="https://maps.google.com/maps?q=SMPN%201%20Jatinagara%2C%20Ciamis&t=h&z=17&output=embed" 
+                className="w-full h-full border-0 transition-all duration-1000" 
                 allowFullScreen={true} 
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"

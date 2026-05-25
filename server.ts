@@ -12,7 +12,7 @@ async function startServer() {
   const PORT = 3000;
   const DATA_FILE = path.join(__dirname, "data.json");
 
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
 
   // Helper to read data
   const readData = () => {

@@ -9,12 +9,15 @@ import {
   googleProvider, 
 } from "../lib/firebase";
 import rawFallbackData from "../../data.json";
+// @ts-ignore
+import defaultPembinaImage from "../assets/images/pembina_pramuka_1779719747205.png";
 
 export default function Admin() {
   const [user, setUser] = useState<any>(null);
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<any>(null);
+  const [localData, setLocalData] = useState<any>(rawFallbackData);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [isUsingFirebase, setIsUsingFirebase] = useState(false);
@@ -70,28 +73,50 @@ export default function Admin() {
     return result.slice(0, 32);
   };
 
-  const setSanitizedData = (newData: any) => {
+  const setSanitizedData = (newData: any, referenceData: any = null) => {
+    const ref = referenceData || localData || rawFallbackData;
     if (!newData) {
-      setData(rawFallbackData);
+      setData(ref);
       return;
     }
+
+    // Merge settings properties safely, avoiding overriding valid image/logo values with empty ones
+    const mergedSettings = {
+      ...ref.settings,
+    };
+
+    if (newData.settings) {
+      Object.keys(newData.settings).forEach((key) => {
+        if (newData.settings[key] !== undefined && newData.settings[key] !== null && newData.settings[key] !== "") {
+          mergedSettings[key] = newData.settings[key];
+        }
+      });
+    }
+
     const merged = {
-      ...rawFallbackData,
+      ...ref,
       ...newData,
-      settings: {
-        ...rawFallbackData.settings,
-        ...(newData.settings || {})
-      },
-      slides: newData.slides && newData.slides.length > 0 ? newData.slides : rawFallbackData.slides,
-      schedule: newData.schedule && newData.schedule.length > 0 ? newData.schedule : rawFallbackData.schedule,
-      news: newData.news && newData.news.length > 0 ? newData.news : rawFallbackData.news,
-      recap: ensure32Teams(newData.recap || rawFallbackData.recap),
-      documents: newData.documents && newData.documents.length > 0 ? newData.documents : rawFallbackData.documents
+      settings: mergedSettings,
+      slides: newData.slides && newData.slides.length > 0 ? newData.slides : ref.slides,
+      schedule: newData.schedule && newData.schedule.length > 0 ? newData.schedule : ref.schedule,
+      news: newData.news && newData.news.length > 0 ? newData.news : ref.news,
+      recap: ensure32Teams(newData.recap || ref.recap),
+      documents: newData.documents && newData.documents.length > 0 ? newData.documents : ref.documents
     };
     setData(merged);
   };
 
   useEffect(() => {
+    // ALWAYS load local data first to populate localData state & reference
+    fetch("/api/data")
+      .then((res) => res.json())
+      .then((d) => {
+        setLocalData(d);
+      })
+      .catch((err) => {
+        console.warn("Pre-loading local data failed, using rawFallbackData", err);
+      });
+
     // If Firebase is not configured, immediately fall back to local API to avoid infinite loading
     if (!auth || !auth.onAuthStateChanged) {
       console.warn("Firebase Auth not detected, falling back to local mode.");
@@ -129,12 +154,13 @@ export default function Admin() {
         return res.json();
       })
       .then((d) => {
-        setSanitizedData(d);
+        setLocalData(d);
+        setSanitizedData(d, d);
         setLoading(false);
       })
       .catch(() => {
         console.warn("Local API/Vercel offline. Using client-side data.json configuration.");
-        setSanitizedData(rawFallbackData);
+        setSanitizedData(rawFallbackData, rawFallbackData);
         setLoading(false);
       });
   };
@@ -143,7 +169,9 @@ export default function Admin() {
     try {
       const siteDoc = await getDoc(doc(db, "settings", "site"));
       if (siteDoc.exists()) {
-        setSanitizedData(siteDoc.data());
+        const cloudData = siteDoc.data();
+        // Load with current local state reference to prevent missing settings fields from wiping local values
+        setSanitizedData(cloudData, localData);
       } else {
         // If not in firestore yet, try local API or default
         loadFromLocalApi();
@@ -189,11 +217,22 @@ export default function Admin() {
 
   const handleSave = async () => {
     setMessage("Sedang menyimpan...");
-    
+
+    // Always keep data.json on local server in sync so fallsback to disk data correctly!
+    try {
+      await fetch("/api/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: password || "admin123", data }),
+      });
+    } catch (e) {
+      console.warn("Background local backup save failed:", e);
+    }
+
     if (isUsingFirebase && db) {
       try {
         await setDoc(doc(db, "settings", "site"), data);
-        setMessage("✅ Berhasil disimpan ke Cloud!");
+        setMessage("✅ Berhasil disimpan ke Cloud & Lokal!");
       } catch (e) {
         setMessage("❌ Gagal simpan ke Cloud: " + (e as Error).message);
       }
@@ -216,6 +255,40 @@ export default function Admin() {
     } catch (e) {
       setMessage("❌ Terjadi kesalahan saat menyimpan.");
     }
+  };
+
+  const handleImageUpload = (file: File, callback: (base64Url: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+        
+        const maxDim = 800; // Optimal resolution for web elements, ensures small payload under 60KB
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.75);
+          callback(compressed);
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   if (loading) return (
@@ -342,6 +415,33 @@ export default function Admin() {
               />
             </div>
             <div className="md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-brand-muted mb-3">Logo Kegiatan (URL atau Upload Gambar)</label>
+              <div className="flex gap-4">
+                <input
+                  className="flex-1 p-4 rounded-2xl bg-brand-surface border border-brand-border font-mono text-xs"
+                  value={data.settings.logo_url || ""}
+                  placeholder="Bawaan: https://i.imgur.com/3jPMvNa.png"
+                  onChange={(e) => setData({ ...data, settings: { ...data.settings, logo_url: e.target.value } })}
+                />
+                <label className="bg-brand-primary text-white font-black px-6 py-4 rounded-2xl text-[10px] uppercase tracking-widest cursor-pointer hover:bg-brand-dark transition-all shrink-0 flex items-center justify-center">
+                  Upload Logo
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleImageUpload(file, (url) => {
+                          setData({ ...data, settings: { ...data.settings, logo_url: url } });
+                        });
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="md:col-span-2">
               <label className="block text-[10px] font-black uppercase tracking-widest text-brand-muted mb-3">Ukuran Font Tabel Rekapitulasi Lomba (10 - 16px)</label>
               <div className="flex items-center gap-4">
                 <input
@@ -353,6 +453,68 @@ export default function Admin() {
                   onChange={(e) => setData({ ...data, settings: { ...data.settings, table_font_size: e.target.value } })}
                 />
                 <span className="font-mono bg-brand-surface border border-brand-border px-4 py-2 rounded-xl text-xs font-bold text-brand-primary whitespace-nowrap">{data.settings.table_font_size || "12"}px</span>
+              </div>
+            </div>
+
+            <div className="md:col-span-2 border-t border-brand-border/40 pt-8 mt-4">
+              <h3 className="text-sm font-black uppercase tracking-wider mb-6 text-brand-primary italic">Profil Pembina/Tokoh (Tentang)</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-4">
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Nama Pembina</label>
+                    <input
+                      className="w-full p-3 rounded-xl bg-brand-surface border border-brand-border font-bold text-sm"
+                      value={data.settings.pembina_name || "Kak Dadi Supriadi"}
+                      onChange={(e) => setData({ ...data, settings: { ...data.settings, pembina_name: e.target.value } })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Deskripsi/Jabatan</label>
+                    <input
+                      className="w-full p-3 rounded-xl bg-brand-surface border border-brand-border text-xs font-bold"
+                      value={data.settings.pembina_title || "Pembina Kwarran Jatinagara / Ka Mabigus"}
+                      onChange={(e) => setData({ ...data, settings: { ...data.settings, pembina_title: e.target.value } })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">URL atau Upload Foto</label>
+                    <div className="flex gap-2">
+                      <input
+                        className="flex-1 p-3 rounded-xl bg-brand-surface border border-brand-border font-mono text-[10px]"
+                        value={data.settings.pembina_image || ""}
+                        placeholder="Contoh: https://... atau klik Pilih File"
+                        onChange={(e) => setData({ ...data, settings: { ...data.settings, pembina_image: e.target.value } })}
+                      />
+                      <label className="bg-brand-primary text-white font-black px-4 py-3 rounded-xl text-[9px] uppercase tracking-widest cursor-pointer hover:bg-brand-dark transition-all shrink-0 flex items-center justify-center">
+                        Pilih File
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(file, (url) => {
+                                setData({ ...data, settings: { ...data.settings, pembina_image: url } });
+                              });
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center justify-center bg-brand-surface border border-brand-border rounded-2xl p-4 gap-2">
+                  <span className="text-[8px] font-black uppercase tracking-widest text-brand-muted">Pratinjau Foto</span>
+                  <div className="w-24 h-32 rounded-lg border border-brand-border overflow-hidden bg-white">
+                    <img 
+                      src={data.settings.pembina_image || defaultPembinaImage} 
+                      alt="Pratinjau" 
+                      className="w-full h-full object-cover object-top"
+                      onError={(e: any) => { e.target.src = defaultPembinaImage; }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -389,16 +551,36 @@ export default function Admin() {
                 </button>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">URL Gambar</label>
-                    <input
-                      className="w-full p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
-                      value={slide.url}
-                      onChange={(e) => {
-                        const newSlides = [...data.slides];
-                        newSlides[idx].url = e.target.value;
-                        setData({ ...data, slides: newSlides });
-                      }}
-                    />
+                    <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">URL atau Upload Gambar</label>
+                    <div className="flex gap-2">
+                      <input
+                        className="flex-1 p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
+                        value={slide.url}
+                        onChange={(e) => {
+                          const newSlides = [...data.slides];
+                          newSlides[idx].url = e.target.value;
+                          setData({ ...data, slides: newSlides });
+                        }}
+                      />
+                      <label className="bg-brand-primary text-white font-black px-4 py-2 rounded-lg text-[9px] uppercase tracking-widest cursor-pointer hover:bg-brand-dark transition-all shrink-0 flex items-center justify-center">
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(file, (url) => {
+                                const newSlides = [...data.slides];
+                                newSlides[idx].url = url;
+                                setData({ ...data, slides: newSlides });
+                              });
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">Judul</label>
@@ -473,16 +655,36 @@ export default function Admin() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">URL Gambar Thumbnail</label>
-                      <input
-                        className="w-full p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
-                        value={article.image}
-                        onChange={(e) => {
-                          const newNews = [...data.news];
-                          newNews[idx].image = e.target.value;
-                          setData({ ...data, news: newNews });
-                        }}
-                      />
+                      <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1">URL atau Upload Thumbnail</label>
+                      <div className="flex gap-2">
+                        <input
+                          className="flex-1 p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
+                          value={article.image}
+                          onChange={(e) => {
+                            const newNews = [...data.news];
+                            newNews[idx].image = e.target.value;
+                            setData({ ...data, news: newNews });
+                          }}
+                        />
+                        <label className="bg-brand-primary text-white font-black px-4 py-2 rounded-lg text-[9px] uppercase tracking-widest cursor-pointer hover:bg-brand-dark transition-all shrink-0 flex items-center justify-center">
+                          Upload
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleImageUpload(file, (url) => {
+                                  const newNews = [...data.news];
+                                  newNews[idx].image = url;
+                                  setData({ ...data, news: newNews });
+                                });
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                   <div>
