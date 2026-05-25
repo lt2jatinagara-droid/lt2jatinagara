@@ -161,6 +161,14 @@ export default function Home() {
   };
 
   const recap = ensure32Teams(rawRecap);
+  const recapPutra = recap.filter((item: any) => 
+    item.team.toLowerCase().includes("putra") || 
+    item.tent_no.toUpperCase().startsWith("PA")
+  );
+  const recapPutri = recap.filter((item: any) => 
+    item.team.toLowerCase().includes("putri") || 
+    item.tent_no.toUpperCase().startsWith("PI")
+  );
   const tableFontSize = Number(settings?.table_font_size || "12");
 
   const COMPETITIONS = [
@@ -626,42 +634,43 @@ export default function Home() {
       </section>
 
       {/* Rekap Section */}
-      <section id="rekap" className="py-24 bg-brand-dark text-white">
+      <section id="rekap" className="py-24 bg-slate-50 text-brand-dark border-b border-brand-border">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">Rekapitulasi <span className="text-brand-primary">Lomba</span></h2>
-            <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Seluruh Mata Lomba</p>
+          {/* REKAPITULASI LOMBA PUTRA */}
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putra</span></h2>
+            <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putra</p>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-md">
+          <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl mb-24">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
                   <tr className="italic text-brand-primary">
-                    <th className="sticky left-0 bg-[#0d0d0d] z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-white/10">No</th>
-                    <th className="sticky left-[64px] bg-[#0d0d0d] z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] max-w-[200px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-b border-white/10">Nama Regu</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-white/10">No Tenda</th>
+                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
+                    <th className="sticky left-[64px] bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] max-w-[200px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-white/10">L-0{i + 1}</th>
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
                     ))}
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-white/10">Total Poin</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
                   </tr>
                 </thead>
-                <tbody className="text-white/90">
-                  {recap.map((item: any, i: number) => (
-                    <tr key={i} className="hover:bg-white/5 transition-colors group">
-                      <td className="sticky left-0 bg-[#0d0d0d] group-hover:bg-[#1a1a1a] transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-white/5">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-white/10 text-white mx-auto text-[10px]">
+                <tbody className="text-brand-dark">
+                  {recapPutra.map((item: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-50 transition-colors group">
+                      <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border/60">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-slate-100 text-brand-dark mx-auto text-[10px] border border-brand-border">
                           {i + 1}
                         </div>
                       </td>
-                      <td className="sticky left-[64px] bg-[#0d0d0d] group-hover:bg-[#1a1a1a] transition-colors z-20 px-4 py-3 font-black uppercase tracking-tight text-[12px] border-r border-white/10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] min-w-[200px] max-w-[200px] truncate border-b border-white/5">
-                        <span className="text-white">{item.team}</span>
+                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] min-w-[200px] max-w-[200px] truncate border-b border-brand-border/60">
+                        <span className="text-brand-dark font-black">{item.team}</span>
                       </td>
-                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-white/5">{item.tent_no}</td>
+                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-white/5">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
                       ))}
-                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-white/5">
+                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
                         {item.total}
                       </td>
                     </tr>
@@ -669,7 +678,55 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
-            <div className="p-8 border-t border-white/10 bg-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-20 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
+            </div>
+          </div>
+
+          {/* REKAPITULASI LOMBA PUTRI */}
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putri</span></h2>
+            <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putri</p>
+          </div>
+          <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
+                <thead>
+                  <tr className="italic text-brand-primary">
+                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
+                    <th className="sticky left-[64px] bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] max-w-[200px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    {Array.from({ length: 20 }).map((_, i) => (
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                    ))}
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                  </tr>
+                </thead>
+                <tbody className="text-brand-dark">
+                  {recapPutri.map((item: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-50 transition-colors group">
+                      <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border/60">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-slate-100 text-brand-dark mx-auto text-[10px] border border-brand-border">
+                          {i + 1}
+                        </div>
+                      </td>
+                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] min-w-[200px] max-w-[200px] truncate border-b border-brand-border/60">
+                        <span className="text-brand-dark font-black">{item.team}</span>
+                      </td>
+                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
+                      {item.scores.map((score: number, sIdx: number) => (
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                      ))}
+                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
+                        {item.total}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-20 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
             </div>
