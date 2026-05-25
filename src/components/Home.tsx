@@ -60,12 +60,30 @@ export default function Home() {
       });
     }
 
+    const rawSchedule = incomingData.schedule && incomingData.schedule.length > 0 ? incomingData.schedule : ref.schedule;
+    const sanitizedSchedule = (rawSchedule || []).map((item: any) => {
+      let d = item.date || "";
+      if (d.includes("28 Juli") || d.includes("28 Juli 2026")) {
+        d = d.replace("28 Juli 2026", "15 September 2026").replace("28 Juli", "15 September 2026");
+      }
+      if (d.includes("29 Juli") || d.includes("29 Juli 2026")) {
+        d = d.replace("29 Juli 2026", "16 September 2026").replace("29 Juli", "16 September 2026");
+      }
+      if (d.includes("30 Juli") || d.includes("30 Juli 2026")) {
+        d = d.replace("30 Juli 2026", "17 September 2026").replace("30 Juli", "17 September 2026");
+      }
+      if (d === "Selasa, 28 Juli 2026") d = "Selasa, 15 September 2026";
+      if (d === "Rabu, 29 Juli 2026") d = "Rabu, 16 September 2026";
+      if (d === "Kamis, 30 Juli 2026") d = "Kamis, 17 September 2026";
+      return { ...item, date: d };
+    });
+
     return {
       ...ref,
       ...incomingData,
       settings: mergedSettings,
       slides: incomingData.slides && incomingData.slides.length > 0 ? incomingData.slides : ref.slides,
-      schedule: incomingData.schedule && incomingData.schedule.length > 0 ? incomingData.schedule : ref.schedule,
+      schedule: sanitizedSchedule,
       news: incomingData.news && incomingData.news.length > 0 ? incomingData.news : ref.news,
       recap: incomingData.recap && incomingData.recap.length > 0 ? incomingData.recap : ref.recap,
       documents: incomingData.documents && incomingData.documents.length > 0 ? incomingData.documents : ref.documents
@@ -600,17 +618,17 @@ export default function Home() {
       {/* Schedule Section */}
       <section id="jadwal" className="py-24 bg-brand-surface">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between items-start mb-12 md:mb-16 gap-6">
             <div>
-              <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">Jadwal Kegiatan</h2>
-              <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Timeline Pelaksanaan Lomba Tingkat II</p>
+              <h2 className="text-3xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">Jadwal Kegiatan</h2>
+              <p className="text-[10px] sm:text-xs font-bold text-brand-primary uppercase tracking-[0.3em] italic">Timeline Pelaksanaan Lomba Tingkat II</p>
             </div>
-            <div className="flex gap-2 p-1.5 bg-white rounded-full border border-brand-border">
+            <div className="flex flex-wrap gap-2 p-1.5 bg-white rounded-3xl border border-brand-border w-full md:w-auto justify-center md:justify-start">
               {schedule.map((day: any, i: number) => (
                 <button
                   key={i}
                   onClick={() => setActiveDay(i)}
-                  className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeDay === i ? "bg-brand-primary text-white shadow-xl" : "bg-transparent text-brand-muted hover:text-black uppercase"}`}
+                  className={`px-5 sm:px-8 py-2 md:py-3 rounded-2xl md:rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeDay === i ? "bg-brand-primary text-white shadow-xl" : "bg-transparent text-brand-muted hover:text-black"}`}
                 >
                   {day.day}
                 </button>
@@ -622,27 +640,29 @@ export default function Home() {
             key={activeDay}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-brand-dark rounded-[40px] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden"
+            className="bg-brand-dark rounded-3xl md:rounded-[40px] p-6 sm:p-10 md:p-14 text-white shadow-2xl relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
               <Clock className="w-64 h-64" />
             </div>
             
-            <div className="flex justify-between items-center mb-12 relative z-10">
-              <h3 className="text-2xl font-black uppercase tracking-widest text-brand-primary italic">{schedule[activeDay].date}</h3>
-              <span className="text-[10px] bg-white/10 px-3 py-1 rounded-md font-bold tracking-widest uppercase">Hari {activeDay + 1}</span>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 relative z-10 border-b border-white/5 pb-6">
+              <h3 className="text-lg sm:text-2xl font-black uppercase tracking-wide text-brand-primary italic leading-snug">{schedule[activeDay].date}</h3>
+              <span className="text-[10px] bg-white/10 px-3.5 py-1.5 rounded-full font-bold tracking-widest uppercase self-start sm:self-auto">Hari {activeDay + 1}</span>
             </div>
 
-            <div className="space-y-10 relative z-10">
+            <div className="space-y-8 relative z-10">
               {schedule[activeDay].events.map((event: any, i: number) => (
-                <div key={i} className="flex gap-6 md:gap-10 items-start group">
-                  <div className="text-brand-primary font-mono font-bold text-sm pt-1 shrink-0 bg-white/5 px-3 py-1 rounded group-hover:bg-brand-primary group-hover:text-white transition-colors">
-                    {event.time.split(' - ')[0]}
+                <div key={i} className="flex flex-col sm:flex-row gap-4 sm:gap-8 md:gap-10 items-start group border-b border-white/5 pb-8 last:border-0 last:pb-0">
+                  <div className="text-brand-primary font-mono font-bold text-xs sm:text-sm py-1.5 px-3 sm:px-4 rounded-lg bg-white/5 shrink-0 group-hover:bg-brand-primary group-hover:text-white transition-all">
+                    {event.time}
                   </div>
-                  <div className="flex-grow">
-                    <h4 className="text-xl font-black uppercase tracking-tight mb-2 leading-none group-hover:text-brand-primary transition-colors">{event.name}</h4>
+                  <div className="flex-grow w-full">
+                    <h4 className="text-base sm:text-lg font-bold text-white tracking-tight mb-3 leading-relaxed whitespace-pre-line group-hover:text-brand-primary transition-colors">
+                      {event.name}
+                    </h4>
                     <p className="text-[11px] text-brand-muted font-bold uppercase tracking-widest flex items-center gap-2">
-                       <MapPin className="w-3 h-3 group-hover:animate-bounce" />
+                       <MapPin className="w-3.5 h-3.5 group-hover:animate-bounce text-brand-primary/80" />
                        {event.location}
                     </p>
                   </div>

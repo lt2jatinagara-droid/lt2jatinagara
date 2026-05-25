@@ -93,12 +93,30 @@ export default function Admin() {
       });
     }
 
+    const rawSchedule = newData.schedule && newData.schedule.length > 0 ? newData.schedule : ref.schedule;
+    const sanitizedSchedule = (rawSchedule || []).map((item: any) => {
+      let d = item.date || "";
+      if (d.includes("28 Juli") || d.includes("28 Juli 2026")) {
+        d = d.replace("28 Juli 2026", "15 September 2026").replace("28 Juli", "15 September 2026");
+      }
+      if (d.includes("29 Juli") || d.includes("29 Juli 2026")) {
+        d = d.replace("29 Juli 2026", "16 September 2026").replace("29 Juli", "16 September 2026");
+      }
+      if (d.includes("30 Juli") || d.includes("30 Juli 2026")) {
+        d = d.replace("30 Juli 2026", "17 September 2026").replace("30 Juli", "17 September 2026");
+      }
+      if (d === "Selasa, 28 Juli 2026") d = "Selasa, 15 September 2026";
+      if (d === "Rabu, 29 Juli 2026") d = "Rabu, 16 September 2026";
+      if (d === "Kamis, 30 Juli 2026") d = "Kamis, 17 September 2026";
+      return { ...item, date: d };
+    });
+
     const merged = {
       ...ref,
       ...newData,
       settings: mergedSettings,
       slides: newData.slides && newData.slides.length > 0 ? newData.slides : ref.slides,
-      schedule: newData.schedule && newData.schedule.length > 0 ? newData.schedule : ref.schedule,
+      schedule: sanitizedSchedule,
       news: newData.news && newData.news.length > 0 ? newData.news : ref.news,
       recap: ensure32Teams(newData.recap || ref.recap),
       documents: newData.documents && newData.documents.length > 0 ? newData.documents : ref.documents
@@ -817,79 +835,161 @@ export default function Admin() {
 
         {/* Schedule Section */}
         <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
-          <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 italic text-brand-primary">Jadwal Kegiatan</h2>
-          <div className="space-y-8">
-            {data.schedule.map((day: any, dIdx: number) => (
-              <div key={dIdx} className="border-t border-brand-border/10 pt-8 first:border-0 first:pt-0">
-                <div className="flex justify-between items-center mb-6">
-                   <div className="flex gap-4 items-center">
-                    <input
-                      className="text-xl font-black uppercase tracking-tight w-32 border-b border-transparent focus:border-brand-primary"
-                      value={day.day}
-                      onChange={(e) => {
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+              <h2 className="text-2xl font-black uppercase tracking-tighter italic text-brand-primary">Jadwal Kegiatan</h2>
+              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest mt-1">Mengubah, Mengedit, Menambah, dan Menghapus Jadwal Lomba & Acara</p>
+            </div>
+            <button
+              onClick={() => {
+                const newSchedule = [...data.schedule];
+                newSchedule.push({
+                  day: `Hari ${newSchedule.length + 1}`,
+                  date: "Selasa, 15 September 2026",
+                  events: [
+                    { time: "08:00 - 10:00", name: "Nama Acara Baru", location: "Gerbang Utama" }
+                  ]
+                });
+                setData({ ...data, schedule: newSchedule });
+              }}
+              className="px-6 py-3 bg-brand-primary hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl flex items-center gap-2 transition-all shadow-md"
+            >
+              <Plus className="w-4 h-4" />
+              Tambah Hari Baru
+            </button>
+          </div>
+
+          <div className="space-y-12">
+            {data.schedule.length === 0 ? (
+              <div className="p-10 text-center border-2 border-dashed border-brand-border/40 rounded-3xl">
+                <p className="text-brand-muted text-sm font-bold">Belum ada hari kegiatan. Silakan tambahkan Hari baru.</p>
+              </div>
+            ) : (
+              data.schedule.map((day: any, dIdx: number) => (
+                <div key={dIdx} className="border-t border-brand-border/20 pt-10 first:border-0 first:pt-0">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-8 pb-4 border-b border-brand-border/10">
+                    <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center w-full sm:w-auto">
+                      <div className="w-full sm:w-auto">
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Nama Hari / Label</label>
+                        <input
+                          className="text-xl font-black uppercase tracking-tight w-full sm:w-32 border-b border-brand-border/30 focus:border-brand-primary focus:outline-none pb-1 bg-transparent placeholder-brand-muted/40"
+                          value={day.day}
+                          placeholder="Misal: Hari 1"
+                          onChange={(e) => {
+                            const newSchedule = [...data.schedule];
+                            newSchedule[dIdx].day = e.target.value;
+                            setData({ ...data, schedule: newSchedule });
+                          }}
+                        />
+                      </div>
+                      <div className="w-full sm:w-auto">
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Tanggal Pelaksanaan</label>
+                        <input
+                          className="text-sm font-bold text-brand-dark uppercase tracking-widest border-b border-brand-border/30 focus:border-brand-primary focus:outline-none pb-1 bg-transparent w-full sm:w-64 placeholder-brand-muted/40"
+                          value={day.date}
+                          placeholder="Misal: Selasa, 15 September 2026"
+                          onChange={(e) => {
+                            const newSchedule = [...data.schedule];
+                            newSchedule[dIdx].date = e.target.value;
+                            setData({ ...data, schedule: newSchedule });
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
                         const newSchedule = [...data.schedule];
-                        newSchedule[dIdx].day = e.target.value;
+                        newSchedule.splice(dIdx, 1);
                         setData({ ...data, schedule: newSchedule });
                       }}
-                    />
-                    <input
-                      className="text-sm font-bold text-brand-muted uppercase tracking-widest"
-                      value={day.date}
-                      onChange={(e) => {
+                      className="px-4 py-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors self-end sm:self-auto"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Hapus {day.day || "Hari"}
+                    </button>
+                  </div>
+
+                  <div className="space-y-6">
+                    {day.events && day.events.map((event: any, eIdx: number) => (
+                      <div key={eIdx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-brand-surface p-5 rounded-2xl border border-brand-border/10">
+                        <div className="md:col-span-3">
+                          <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Waktu Kegiatan</label>
+                          <input
+                            className="w-full bg-white px-3 py-2 rounded-lg text-xs font-mono font-bold text-brand-primary border border-brand-border/40 focus:border-brand-primary focus:outline-none"
+                            value={event.time}
+                            placeholder="08:00 - 10:00"
+                            onChange={(e) => {
+                              const newSchedule = [...data.schedule];
+                              newSchedule[dIdx].events[eIdx].time = e.target.value;
+                              setData({ ...data, schedule: newSchedule });
+                            }}
+                          />
+                        </div>
+                        <div className="md:col-span-5">
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted font-sans">Nama Kegiatan / Lomba</label>
+                            <span className="text-[8px] font-mono font-bold text-brand-muted">
+                              {(event.name || "").length}/1000
+                            </span>
+                          </div>
+                          <textarea
+                            className="w-full bg-white px-3 py-2 rounded-lg font-bold text-brand-dark text-xs border border-brand-border/40 focus:border-brand-primary focus:outline-none resize-y min-h-[64px]"
+                            value={event.name}
+                            placeholder="Nama kegiatan (maksimal 1000 karakter, tekan Enter untuk membuat baris baru)"
+                            maxLength={1000}
+                            rows={2}
+                            onChange={(e) => {
+                              const newSchedule = [...data.schedule];
+                              newSchedule[dIdx].events[eIdx].name = e.target.value;
+                              setData({ ...data, schedule: newSchedule });
+                            }}
+                          />
+                        </div>
+                        <div className="md:col-span-3">
+                          <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Lokasi</label>
+                          <input
+                            className="w-full bg-white px-3 py-2 rounded-lg text-brand-muted font-bold text-xs border border-brand-border/40 focus:border-brand-primary focus:outline-none"
+                            value={event.location || ""}
+                            placeholder="Lokasi kegiatan"
+                            onChange={(e) => {
+                              const newSchedule = [...data.schedule];
+                              newSchedule[dIdx].events[eIdx].location = e.target.value;
+                              setData({ ...data, schedule: newSchedule });
+                            }}
+                          />
+                        </div>
+                        <div className="md:col-span-1 flex items-end justify-center h-full pt-2 md:pt-4">
+                          <button
+                            onClick={() => {
+                              const newSchedule = [...data.schedule];
+                              newSchedule[dIdx].events.splice(eIdx, 1);
+                              setData({ ...data, schedule: newSchedule });
+                            }}
+                            className="p-2 text-brand-muted/40 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            title="Hapus Acara"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={() => {
                         const newSchedule = [...data.schedule];
-                        newSchedule[dIdx].date = e.target.value;
+                        newSchedule[dIdx].events.push({ time: "08:00 - 10:00", name: "Acara Baru", location: "Lokasi" });
                         setData({ ...data, schedule: newSchedule });
                       }}
-                    />
+                      className="w-full p-4 border border-dashed border-brand-border rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Tambah Acara
+                    </button>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  {day.events.map((event: any, eIdx: number) => (
-                    <div key={eIdx} className="flex gap-4 items-center bg-brand-surface p-4 rounded-2xl">
-                      <input
-                        className="w-32 bg-transparent text-xs font-mono font-bold text-brand-primary"
-                        value={event.time}
-                        onChange={(e) => {
-                          const newSchedule = [...data.schedule];
-                          newSchedule[dIdx].events[eIdx].time = e.target.value;
-                          setData({ ...data, schedule: newSchedule });
-                        }}
-                      />
-                      <input
-                        className="flex-1 bg-transparent font-bold text-brand-dark"
-                        value={event.name}
-                        onChange={(e) => {
-                          const newSchedule = [...data.schedule];
-                          newSchedule[dIdx].events[eIdx].name = e.target.value;
-                          setData({ ...data, schedule: newSchedule });
-                        }}
-                      />
-                      <button
-                        onClick={() => {
-                          const newSchedule = [...data.schedule];
-                          newSchedule[dIdx].events.splice(eIdx, 1);
-                          setData({ ...data, schedule: newSchedule });
-                        }}
-                        className="p-2 text-brand-muted/30 hover:text-brand-primary transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => {
-                      const newSchedule = [...data.schedule];
-                      newSchedule[dIdx].events.push({ time: "00:00 - 00:00", name: "Acara Baru", location: "Lokasi" });
-                      setData({ ...data, schedule: newSchedule });
-                    }}
-                    className="w-full p-4 border border-dashed border-brand-border rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
-                  >
-                    <Plus className="w-3 h-3" />
-                    Tambah Acara
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </section>
 
