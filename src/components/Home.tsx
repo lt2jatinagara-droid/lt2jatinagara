@@ -42,6 +42,7 @@ export default function Home() {
   const [siteData, setSiteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedNews, setSelectedNews] = useState<any | null>(null);
 
   const mergeWithFallback = (incomingData: any, referenceData: any = rawFallbackData) => {
     if (!incomingData) return referenceData || rawFallbackData;
@@ -486,7 +487,10 @@ export default function Home() {
                   transition={{ delay: i * 0.1 }}
                   className="group"
                 >
-                  <div className="aspect-[16/10] rounded-[32px] overflow-hidden bg-brand-surface border border-brand-border mb-6 relative">
+                  <div 
+                    onClick={() => setSelectedNews(item)}
+                    className="cursor-pointer aspect-[16/10] rounded-[32px] overflow-hidden bg-brand-surface border border-brand-border mb-6 relative pr-0"
+                  >
                     <img 
                       src={item.image} 
                       alt={item.title} 
@@ -500,13 +504,19 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                  <h3 className="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-brand-primary transition-colors line-clamp-2">
+                  <h3 
+                    onClick={() => setSelectedNews(item)}
+                    className="cursor-pointer text-xl font-black uppercase tracking-tight mb-4 group-hover:text-brand-primary transition-colors line-clamp-2"
+                  >
                     {item.title}
                   </h3>
                   <p className="text-xs text-brand-muted leading-relaxed line-clamp-3 mb-6 italic">
                     {item.excerpt}
                   </p>
-                  <button className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:gap-3 transition-all flex items-center gap-2">
+                  <button 
+                    onClick={() => setSelectedNews(item)}
+                    className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:gap-3 transition-all flex items-center gap-2"
+                  >
                     Baca Selengkapnya <ChevronRight className="w-3 h-3" />
                   </button>
                 </motion.div>
@@ -890,6 +900,90 @@ export default function Home() {
           WhatsApp Panitia
         </span>
       </a>
+
+      {/* News Article Detail Modal */}
+      <AnimatePresence>
+        {selectedNews && (
+          <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 md:p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-brand-dark/80 backdrop-blur-md" 
+              onClick={() => setSelectedNews(null)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0.15 }}
+              className="relative bg-white rounded-[40px] border border-brand-border shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] max-w-3xl w-full overflow-hidden max-h-[90vh] flex flex-col z-10"
+            >
+              {/* Header Image */}
+              <div className="relative h-60 md:h-80 w-full overflow-hidden shrink-0 bg-brand-surface">
+                <img 
+                  src={selectedNews.image} 
+                  alt={selectedNews.title} 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={(e: any) => { e.target.src = "https://picsum.photos/seed/news/800/600"; }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex items-end p-6 md:p-10">
+                  <div>
+                    <span className="bg-brand-primary text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest inline-block mb-3 shadow-md">
+                      {selectedNews.date}
+                    </span>
+                    <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight">
+                      {selectedNews.title}
+                    </h3>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedNews(null)}
+                  className="absolute top-6 right-6 p-3 bg-white/20 hover:bg-white/40 text-white rounded-full transition-all backdrop-blur-md border border-white/20 hover:scale-110 active:scale-95"
+                  aria-label="Tutup"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="p-6 md:p-10 overflow-y-auto text-brand-dark font-sans leading-relaxed text-sm space-y-6 scrollbar-thin">
+                {String(selectedNews.excerpt || "")
+                  .split("\n\n")
+                  .map((para, pIdx) => {
+                    if (para.startsWith("**") && para.includes("**")) {
+                      const parts = para.split("**");
+                      return (
+                        <p key={pIdx} className="text-base font-bold text-brand-dark leading-snug">
+                          {parts.map((p, idx) => (
+                            idx % 2 === 1 ? <strong key={idx} className="font-extrabold text-brand-primary">{p}</strong> : p
+                          ))}
+                        </p>
+                      );
+                    }
+                    return (
+                      <p key={pIdx} className="text-slate-600 font-medium whitespace-pre-line leading-relaxed">
+                        {para}
+                      </p>
+                    );
+                  })}
+              </div>
+
+              {/* Sticky footer */}
+              <div className="px-6 py-4 md:px-10 border-t border-brand-border bg-slate-50 flex justify-end shrink-0 gap-4">
+                <button 
+                  onClick={() => setSelectedNews(null)}
+                  className="px-6 py-3 bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-brand-dark transition-all shadow-md active:scale-95 text-center"
+                >
+                  Tutup Artikel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
