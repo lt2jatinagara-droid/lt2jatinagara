@@ -581,7 +581,7 @@ export default function Home() {
                   {settings?.pembina_name || "Kak Dadi Supriadi"}
                 </h4>
                 <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest mt-1.5 leading-tight">
-                  {settings?.pembina_title || "Pembina Kwarran Jatinagara / Ka Mabigus"}
+                  {settings?.pembina_title || "KA Kwarran Jatinagara  Kwarcab Ciamis"}
                 </p>
               </div>
             </motion.div>
@@ -661,7 +661,7 @@ export default function Home() {
                 <thead>
                   <tr className="italic text-brand-primary">
                     <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
-                    <th className="sticky left-[64px] bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] max-w-[200px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
+                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
                       <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
@@ -677,7 +677,7 @@ export default function Home() {
                           {i + 1}
                         </div>
                       </td>
-                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] min-w-[200px] max-w-[200px] truncate border-b border-brand-border/60">
+                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-2 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] w-[100px] min-w-[100px] max-w-[100px] truncate border-b border-brand-border/60">
                         <span className="text-brand-dark font-black">{item.team}</span>
                       </td>
                       <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
@@ -709,7 +709,7 @@ export default function Home() {
                 <thead>
                   <tr className="italic text-brand-primary">
                     <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
-                    <th className="sticky left-[64px] bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest min-w-[200px] max-w-[200px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
+                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
                       <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
@@ -725,7 +725,7 @@ export default function Home() {
                           {i + 1}
                         </div>
                       </td>
-                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] min-w-[200px] max-w-[200px] truncate border-b border-brand-border/60">
+                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-2 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] w-[100px] min-w-[100px] max-w-[100px] truncate border-b border-brand-border/60">
                         <span className="text-brand-dark font-black">{item.team}</span>
                       </td>
                       <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>

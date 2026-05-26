@@ -663,7 +663,7 @@ export default function Admin() {
                     <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">Deskripsi/Jabatan</label>
                     <input
                       className="w-full p-3 rounded-xl bg-brand-surface border border-brand-border text-xs font-bold"
-                      value={data.settings.pembina_title || "Pembina Kwarran Jatinagara / Ka Mabigus"}
+                      value={data.settings.pembina_title || "KA Kwarran Jatinagara  Kwarcab Ciamis"}
                       onChange={(e) => setData({ ...data, settings: { ...data.settings, pembina_title: e.target.value } })}
                     />
                   </div>
