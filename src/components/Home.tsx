@@ -477,7 +477,7 @@ export default function Home() {
                 Lihat Semua Berita →
               </a>
             </div>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {news.map((item: any, i: number) => (
                 <motion.div
                   key={item.id}
@@ -489,7 +489,7 @@ export default function Home() {
                 >
                   <div 
                     onClick={() => setSelectedNews(item)}
-                    className="cursor-pointer aspect-[16/10] rounded-[32px] overflow-hidden bg-brand-surface border border-brand-border mb-6 relative pr-0"
+                    className="cursor-pointer w-full aspect-[16/10] sm:aspect-[4/3] md:aspect-[16/10] lg:aspect-[16/11] xl:aspect-[16/10] rounded-[32px] overflow-hidden bg-brand-surface border border-brand-border mb-6 relative pr-0"
                   >
                     <img 
                       src={item.image} 
@@ -799,31 +799,7 @@ export default function Home() {
             <div>
               <div className="inline-block bg-brand-dark text-white text-[10px] font-bold px-3 py-1 rounded uppercase tracking-[0.3em] mb-6 italic">Venue Utama</div>
               <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-6">Informasi <br /><span className="text-brand-primary">Lokasi</span></h2>
-              <div className="space-y-6">
-                <div className="bg-brand-surface border border-brand-border p-8 rounded-3xl shadow-sm flex gap-6 group hover:border-brand-primary transition-colors">
-                  <div className="p-4 bg-white shadow-sm rounded-2xl h-fit text-brand-primary font-black uppercase text-xs tracking-widest">MAP</div>
-                  <div className="flex-1">
-                    <p className="font-black text-black mb-2 uppercase tracking-tight">{settings.location_name}</p>
-                    <p className="text-xs text-brand-muted leading-relaxed">{settings.location_address}</p>
-                    <button className="mt-4 text-[10px] font-black text-brand-primary flex items-center gap-1 uppercase tracking-[0.2em] hover:gap-3 transition-all">
-                      Buka di Google Maps →
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="bg-brand-dark border border-brand-dark p-8 rounded-3xl shadow-xl flex gap-6 text-white group">
-                  <div className="p-4 bg-white/10 rounded-2xl h-fit text-brand-primary">
-                    <Phone className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-xs uppercase tracking-[0.3em] mb-4 text-brand-primary italic">Kontak Panitia</h4>
-                    <div className="space-y-2">
-                       <p className="text-md font-bold">+62 812 3456 7890 <span className="text-brand-muted font-medium font-sans text-xs ml-2">(Kak Ahmad)</span></p>
-                       <p className="text-md font-bold">+62 812 0987 6543 <span className="text-brand-muted font-medium font-sans text-xs ml-2">(Kak Siti)</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
             </div>
             <div className="rounded-[40px] overflow-hidden shadow-2xl aspect-[4/5] bg-brand-surface border border-brand-border relative group">
               <iframe 
