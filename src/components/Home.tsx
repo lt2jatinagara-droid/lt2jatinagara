@@ -144,7 +144,7 @@ export default function Home() {
 
   if (loading || !siteData) return <div className="min-h-screen bg-brand-surface flex items-center justify-center font-bold uppercase tracking-widest text-brand-muted">Loading...</div>;
 
-  const { schedule, recap: rawRecap, settings, slides = [], news = [] } = siteData;
+  const { schedule, recap_sd: rawRecapSd, recap_smp: rawRecapSmp, settings, slides = [], news = [] } = siteData;
 
   // Ensure exactly 32 teams are always returned and configured
   const ensure32Teams = (recapList: any[]): any[] => {
@@ -210,15 +210,30 @@ export default function Home() {
     });
   };
 
-  const recap = ensure32Teams(rawRecap);
-  const recapPutra = recap
+  const recapSd = ensure32Teams(rawRecapSd || (siteData as any).recap);
+  const recapSdPutra = recapSd
     .filter((item: any) => 
       item.team.toLowerCase().includes("putra") || 
       item.tent_no.toUpperCase().startsWith("PA")
     )
     .sort((a, b) => b.total - a.total);
 
-  const recapPutri = recap
+  const recapSdPutri = recapSd
+    .filter((item: any) => 
+      item.team.toLowerCase().includes("putri") || 
+      item.tent_no.toUpperCase().startsWith("PI")
+    )
+    .sort((a, b) => b.total - a.total);
+
+  const recapSmp = ensure32Teams(rawRecapSmp || (siteData as any).recap);
+  const recapSmpPutra = recapSmp
+    .filter((item: any) => 
+      item.team.toLowerCase().includes("putra") || 
+      item.tent_no.toUpperCase().startsWith("PA")
+    )
+    .sort((a, b) => b.total - a.total);
+
+  const recapSmpPutri = recapSmp
     .filter((item: any) => 
       item.team.toLowerCase().includes("putri") || 
       item.tent_no.toUpperCase().startsWith("PI")
@@ -273,15 +288,18 @@ export default function Home() {
           </div>
           
           <div className="hidden md:flex gap-6 text-xs font-bold uppercase tracking-wider">
-            {["Beranda", "Tentang", "Berita", "Jadwal", "Rekap", "Dokumen", "Lokasi"].map((item) => (
-              <a 
-                key={item} 
-                href={`#${item.toLowerCase()}`}
-                className={`transition-colors pb-1 border-b-2 border-transparent hover:border-brand-primary ${scrolled ? "text-brand-muted hover:text-black" : "text-white/80 hover:text-white"}`}
-              >
-                {item}
-              </a>
-            ))}
+            {["Beranda", "Tentang", "Berita", "Jadwal", "Rekap SD/MI", "Rekap SMP/MTs", "Dokumen", "Lokasi"].map((item) => {
+              const href = item === "Rekap SD/MI" ? "#rekap-sd" : item === "Rekap SMP/MTs" ? "#rekap-smp" : `#${item.toLowerCase()}`;
+              return (
+                <a 
+                  key={item} 
+                  href={href}
+                  className={`transition-colors pb-1 border-b-2 border-transparent hover:border-brand-primary ${scrolled ? "text-brand-muted hover:text-black" : "text-white/80 hover:text-white"}`}
+                >
+                  {item}
+                </a>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-4 relative">
@@ -336,16 +354,19 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="absolute top-full left-0 w-full bg-white shadow-xl p-6 md:hidden flex flex-col gap-4"
             >
-              {["Beranda", "Tentang", "Berita", "Jadwal", "Rekap", "Dokumen", "Lokasi"].map((item) => (
-                <a 
-                  key={item} 
-                  href={`#${item.toLowerCase()}`}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-sm font-bold uppercase tracking-widest border-b border-brand-border pb-2 text-brand-muted"
-                >
-                  {item}
-                </a>
-              ))}
+              {["Beranda", "Tentang", "Berita", "Jadwal", "Rekap SD/MI", "Rekap SMP/MTs", "Dokumen", "Lokasi"].map((item) => {
+                const href = item === "Rekap SD/MI" ? "#rekap-sd" : item === "Rekap SMP/MTs" ? "#rekap-smp" : `#${item.toLowerCase()}`;
+                return (
+                  <a 
+                    key={item} 
+                    href={href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-sm font-bold uppercase tracking-widest border-b border-brand-border pb-2 text-brand-muted"
+                  >
+                    {item}
+                  </a>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
@@ -657,12 +678,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Rekap Section */}
-      <section id="rekap" className="py-24 bg-slate-50 text-brand-dark border-b border-brand-border">
+      {/* Rekap SD/MI Section */}
+      <section id="rekap-sd" className="py-24 bg-slate-50 text-brand-dark border-b border-brand-border">
         <div className="max-w-7xl mx-auto px-6">
-          {/* REKAPITULASI LOMBA PUTRA */}
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">REKAPITULASI <span className="text-brand-primary">SD/MI</span></h2>
+            <p className="text-[11px] font-black tracking-[0.2em] text-brand-muted uppercase italic">Peringkat & Klasemen Akhir Tingkat SD/MI</p>
+          </div>
+
+          {/* REKAPITULASI LOMBA PUTRA SD */}
           <div className="text-center mb-10">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putra</span></h2>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putra (SD/MI)</span></h2>
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putra</p>
           </div>
           <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl mb-24">
@@ -680,7 +706,7 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
-                  {recapPutra.map((item: any, i: number) => (
+                  {recapSdPutra.map((item: any, i: number) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors group">
                       <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border/60">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-slate-100 text-brand-dark mx-auto text-[10px] border border-brand-border">
@@ -708,9 +734,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* REKAPITULASI LOMBA PUTRI */}
+          {/* REKAPITULASI LOMBA PUTRI SD */}
           <div className="text-center mb-10">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putri</span></h2>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putri (SD/MI)</span></h2>
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putri</p>
           </div>
           <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl">
@@ -728,7 +754,113 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
-                  {recapPutri.map((item: any, i: number) => (
+                  {recapSdPutri.map((item: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-50 transition-colors group">
+                      <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border/60">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-slate-100 text-brand-dark mx-auto text-[10px] border border-brand-border">
+                          {i + 1}
+                        </div>
+                      </td>
+                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-2 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] w-[100px] min-w-[100px] max-w-[100px] truncate border-b border-brand-border/60">
+                        <span className="text-brand-dark font-black">{item.team}</span>
+                      </td>
+                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
+                      {item.scores.map((score: number, sIdx: number) => (
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                      ))}
+                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
+                        {item.total}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-20 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Rekap SMP/MTs Section */}
+      <section id="rekap-smp" className="py-24 bg-slate-50 text-brand-dark border-b border-brand-border">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black text-black tracking-tighter uppercase mb-2">REKAPITULASI <span className="text-brand-primary">SMP/MTs</span></h2>
+            <p className="text-[11px] font-black tracking-[0.2em] text-brand-muted uppercase italic">Peringkat & Klasemen Akhir Tingkat SMP/MTs</p>
+          </div>
+
+          {/* REKAPITULASI LOMBA PUTRA SMP */}
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putra (SMP/MTs)</span></h2>
+            <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putra</p>
+          </div>
+          <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl mb-24">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
+                <thead>
+                  <tr className="italic text-brand-primary">
+                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
+                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    {Array.from({ length: 20 }).map((_, i) => (
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                    ))}
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                  </tr>
+                </thead>
+                <tbody className="text-brand-dark">
+                  {recapSmpPutra.map((item: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-50 transition-colors group">
+                      <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border/60">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-slate-100 text-brand-dark mx-auto text-[10px] border border-brand-border">
+                          {i + 1}
+                        </div>
+                      </td>
+                      <td className="sticky left-[64px] bg-white group-hover:bg-slate-50 transition-colors z-20 px-2 py-3 font-semibold uppercase tracking-tight text-[12px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] w-[100px] min-w-[100px] max-w-[100px] truncate border-b border-brand-border/60">
+                        <span className="text-brand-dark font-black">{item.team}</span>
+                      </td>
+                      <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
+                      {item.scores.map((score: number, sIdx: number) => (
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                      ))}
+                      <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
+                        {item.total}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-20 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
+            </div>
+          </div>
+
+          {/* REKAPITULASI LOMBA PUTRI SMP */}
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase mb-4">Rekapitulasi Lomba <span className="text-brand-primary">Putri (SMP/MTs)</span></h2>
+            <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putri</p>
+          </div>
+          <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
+                <thead>
+                  <tr className="italic text-brand-primary">
+                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
+                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    {Array.from({ length: 20 }).map((_, i) => (
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                    ))}
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                  </tr>
+                </thead>
+                <tbody className="text-brand-dark">
+                  {recapSmpPutri.map((item: any, i: number) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors group">
                       <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 px-4 py-3 text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border/60">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black bg-slate-100 text-brand-dark mx-auto text-[10px] border border-brand-border">

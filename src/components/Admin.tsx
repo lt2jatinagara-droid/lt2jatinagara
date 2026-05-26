@@ -21,7 +21,8 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [isUsingFirebase, setIsUsingFirebase] = useState(false);
-  const [activeRecapTab, setActiveRecapTab] = useState<"putra" | "putri">("putra");
+  const [activeRecapTabSd, setActiveRecapTabSd] = useState<"putra" | "putri">("putra");
+  const [activeRecapTabSmp, setActiveRecapTabSmp] = useState<"putra" | "putri">("putra");
 
   const ensure32Teams = (recapList: any[]): any[] => {
     const list = recapList || [];
@@ -120,6 +121,8 @@ export default function Admin() {
       schedule: sanitizedSchedule,
       news: newData.news && newData.news.length > 0 ? newData.news : ref.news,
       recap: ensure32Teams(newData.recap || ref.recap),
+      recap_sd: ensure32Teams(newData.recap_sd || ref.recap_sd || newData.recap || ref.recap),
+      recap_smp: ensure32Teams(newData.recap_smp || ref.recap_smp || newData.recap || ref.recap),
       documents: newData.documents && newData.documents.length > 0 ? newData.documents : ref.documents
     };
     setData(merged);
@@ -407,14 +410,14 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Recap Section */}
+        {/* Recap SD/MI Section */}
         <section className="bg-white p-6 md:p-10 rounded-[40px] border border-brand-border shadow-xl overflow-hidden mb-12">
           {/* Header & Tabs */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8 pb-6 border-b border-brand-border/40">
             <div>
-              <h2 className="text-2xl font-black uppercase tracking-tighter mb-1 italic text-brand-primary">Pengaturan Skor & Rekapitulasi</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tighter mb-1 italic text-brand-primary">Pengaturan Skor & Rekapitulasi SD/MI</h2>
               <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">
-                Kelola penilaian regu secara terpisah (Putra & Putri)
+                Kelola penilaian regu tingkat SD/MI secara terpisah (Putra & Putri)
               </p>
             </div>
             
@@ -422,34 +425,34 @@ export default function Admin() {
             <div className="flex gap-2 p-1 bg-brand-surface rounded-2xl border border-brand-border shrink-0 self-stretch sm:self-auto justify-center">
               <button
                 type="button"
-                onClick={() => setActiveRecapTab("putra")}
+                onClick={() => setActiveRecapTabSd("putra")}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-                  activeRecapTab === "putra"
+                  activeRecapTabSd === "putra"
                     ? "bg-brand-primary text-white shadow-md font-bold"
                     : "bg-transparent text-brand-muted hover:text-black font-semibold"
                 }`}
               >
                 <span>♂️ Regu Putra</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                  activeRecapTab === "putra" ? "bg-white/20 text-white" : "bg-brand-border/40 text-brand-muted"
+                  activeRecapTabSd === "putra" ? "bg-white/20 text-white" : "bg-brand-border/40 text-brand-muted"
                 }`}>
-                  {(data?.recap || []).filter((item: any) => item.team.toLowerCase().includes("putra") || item.tent_no.toUpperCase().startsWith("PA")).length}
+                  {(data?.recap_sd || []).filter((item: any) => item.team.toLowerCase().includes("putra") || item.tent_no.toUpperCase().startsWith("PA")).length}
                 </span>
               </button>
               <button
                 type="button"
-                onClick={() => setActiveRecapTab("putri")}
+                onClick={() => setActiveRecapTabSd("putri")}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-                  activeRecapTab === "putri"
+                  activeRecapTabSd === "putri"
                     ? "bg-brand-primary text-white shadow-md font-bold"
                     : "bg-transparent text-brand-muted hover:text-black font-semibold"
                 }`}
               >
                 <span>♀️ Regu Putri</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                  activeRecapTab === "putri" ? "bg-white/20 text-white" : "bg-brand-border/40 text-brand-muted"
+                  activeRecapTabSd === "putri" ? "bg-white/20 text-white" : "bg-brand-border/40 text-brand-muted"
                 }`}>
-                  {(data?.recap || []).filter((item: any) => item.team.toLowerCase().includes("putri") || item.tent_no.toUpperCase().startsWith("PI")).length}
+                  {(data?.recap_sd || []).filter((item: any) => item.team.toLowerCase().includes("putri") || item.tent_no.toUpperCase().startsWith("PI")).length}
                 </span>
               </button>
             </div>
@@ -471,7 +474,7 @@ export default function Admin() {
               </thead>
               <tbody>
                 {(() => {
-                  const mappedWithIndex = (data?.recap || []).map((item: any, originalIndex: number) => ({ ...item, originalIndex }));
+                  const mappedWithIndex = (data?.recap_sd || []).map((item: any, originalIndex: number) => ({ ...item, originalIndex }));
                   const putraTeamsInRecap = mappedWithIndex.filter((item: any) => 
                     item.team.toLowerCase().includes("putra") || 
                     item.tent_no.toUpperCase().startsWith("PA")
@@ -486,7 +489,7 @@ export default function Admin() {
                     !item.team.toLowerCase().includes("putri") && 
                     !item.tent_no.toUpperCase().startsWith("PI")
                   );
-                  const displayedTeams = activeRecapTab === "putra" 
+                  const displayedTeams = activeRecapTabSd === "putra" 
                     ? [...putraTeamsInRecap, ...otherTeamsInRecap] 
                     : putriTeamsInRecap;
 
@@ -500,9 +503,9 @@ export default function Admin() {
                             className="w-full bg-transparent font-black uppercase tracking-tight text-[12px] text-brand-dark focus:outline-none"
                             value={item.team}
                             onChange={(e) => {
-                              const newRecap = [...data.recap];
+                              const newRecap = [...data.recap_sd];
                               newRecap[i].team = e.target.value;
-                              setData({ ...data, recap: newRecap });
+                              setData({ ...data, recap_sd: newRecap });
                             }}
                           />
                         </td>
@@ -511,9 +514,9 @@ export default function Admin() {
                             className="w-20 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-[11px] focus:outline-none"
                             value={item.tent_no || ""}
                             onChange={(e) => {
-                              const newRecap = [...data.recap];
+                              const newRecap = [...data.recap_sd];
                               newRecap[i].tent_no = e.target.value;
-                              setData({ ...data, recap: newRecap });
+                              setData({ ...data, recap_sd: newRecap });
                             }}
                           />
                         </td>
@@ -524,12 +527,12 @@ export default function Admin() {
                               className="w-14 bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
                               value={item.scores[sIdx] || 0}
                               onChange={(e) => {
-                                const newRecap = [...data.recap];
+                                const newRecap = [...data.recap_sd];
                                 const val = parseInt(e.target.value) || 0;
                                 newRecap[i].scores[sIdx] = val;
                                 // Recalculate total
                                 newRecap[i].total = newRecap[i].scores.reduce((a: number, b: number) => a + b, 0);
-                                setData({ ...data, recap: newRecap });
+                                setData({ ...data, recap_sd: newRecap });
                               }}
                             />
                           </td>
@@ -540,9 +543,9 @@ export default function Admin() {
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
                           <button
                             onClick={() => {
-                              const newRecap = [...data.recap];
+                              const newRecap = [...data.recap_sd];
                               newRecap.splice(i, 1);
-                              setData({ ...data, recap: newRecap });
+                              setData({ ...data, recap_sd: newRecap });
                             }}
                             className="p-2 text-slate-300 hover:text-brand-primary transition-colors"
                           >
@@ -558,12 +561,12 @@ export default function Admin() {
           </div>
           <button
             onClick={() => {
-              const prefixName = activeRecapTab === "putra" ? "Regu Baru (Putra)" : "Regu Baru (Putri)";
-              const prefixCargo = activeRecapTab === "putra" ? "PA-" : "PI-";
+              const prefixName = activeRecapTabSd === "putra" ? "Regu Baru (Putra)" : "Regu Baru (Putri)";
+              const prefixCargo = activeRecapTabSd === "putra" ? "PA-" : "PI-";
               setData({ 
                 ...data, 
-                recap: [...data.recap, { 
-                  rank: data.recap.length + 1, 
+                recap_sd: [...data.recap_sd, { 
+                  rank: data.recap_sd.length + 1, 
                   team: prefixName, 
                   tent_no: prefixCargo, 
                   scores: Array(20).fill(0),
@@ -574,7 +577,178 @@ export default function Admin() {
             className="mt-8 w-full p-6 border border-dashed border-brand-border rounded-3xl text-[10px] font-black uppercase tracking-[0.3em] text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Tambah Baris Regu {activeRecapTab === "putra" ? "Putra" : "Putri"}
+            Tambah Baris Regu {activeRecapTabSd === "putra" ? "Putra" : "Putri"} (SD/MI)
+          </button>
+        </section>
+
+        {/* Recap SMP/MTs Section */}
+        <section className="bg-white p-6 md:p-10 rounded-[40px] border border-brand-border shadow-xl overflow-hidden mb-12">
+          {/* Header & Tabs */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8 pb-6 border-b border-brand-border/40">
+            <div>
+              <h2 className="text-2xl font-black uppercase tracking-tighter mb-1 italic text-brand-primary">Pengaturan Skor & Rekapitulasi SMP/MTs</h2>
+              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">
+                Kelola penilaian regu tingkat SMP/MTs secara terpisah (Putra & Putri)
+              </p>
+            </div>
+            
+            {/* Tabs Selector */}
+            <div className="flex gap-2 p-1 bg-brand-surface rounded-2xl border border-brand-border shrink-0 self-stretch sm:self-auto justify-center">
+              <button
+                type="button"
+                onClick={() => setActiveRecapTabSmp("putra")}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  activeRecapTabSmp === "putra"
+                    ? "bg-brand-primary text-white shadow-md font-bold"
+                    : "bg-transparent text-brand-muted hover:text-black font-semibold"
+                }`}
+              >
+                <span>♂️ Regu Putra</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                  activeRecapTabSmp === "putra" ? "bg-white/20 text-white" : "bg-brand-border/40 text-brand-muted"
+                }`}>
+                  {(data?.recap_smp || []).filter((item: any) => item.team.toLowerCase().includes("putra") || item.tent_no.toUpperCase().startsWith("PA")).length}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveRecapTabSmp("putri")}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  activeRecapTabSmp === "putri"
+                    ? "bg-brand-primary text-white shadow-md font-bold"
+                    : "bg-transparent text-brand-muted hover:text-black font-semibold"
+                }`}
+              >
+                <span>♀️ Regu Putri</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                  activeRecapTabSmp === "putri" ? "bg-white/20 text-white" : "bg-brand-border/40 text-brand-muted"
+                }`}>
+                  {(data?.recap_smp || []).filter((item: any) => item.team.toLowerCase().includes("putri") || item.tent_no.toUpperCase().startsWith("PI")).length}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto -mx-6 px-6">
+            <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none text-[12px]">
+              <thead>
+                <tr>
+                  <th className="sticky left-0 bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b border-brand-border/10">No</th>
+                  <th className="sticky left-[48px] bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] border-b border-brand-border/10 min-w-[180px]">Nama Regu</th>
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b border-brand-border/10">No Tenda</th>
+                  {Array.from({ length: 20 }).map((_, i) => (
+                    <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b border-brand-border/10">Lomba {i + 1}</th>
+                  ))}
+                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b border-brand-border/10">Total</th>
+                  <th className="py-4 px-4 text-right border-b border-brand-border/10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  const mappedWithIndex = (data?.recap_smp || []).map((item: any, originalIndex: number) => ({ ...item, originalIndex }));
+                  const putraTeamsInRecap = mappedWithIndex.filter((item: any) => 
+                    item.team.toLowerCase().includes("putra") || 
+                    item.tent_no.toUpperCase().startsWith("PA")
+                  );
+                  const putriTeamsInRecap = mappedWithIndex.filter((item: any) => 
+                    item.team.toLowerCase().includes("putri") || 
+                    item.tent_no.toUpperCase().startsWith("PI")
+                  );
+                  const otherTeamsInRecap = mappedWithIndex.filter((item: any) => 
+                    !item.team.toLowerCase().includes("putra") && 
+                    !item.tent_no.toUpperCase().startsWith("PA") &&
+                    !item.team.toLowerCase().includes("putri") && 
+                    !item.tent_no.toUpperCase().startsWith("PI")
+                  );
+                  const displayedTeams = activeRecapTabSmp === "putra" 
+                    ? [...putraTeamsInRecap, ...otherTeamsInRecap] 
+                    : putriTeamsInRecap;
+
+                  return displayedTeams.map((item: any, idx: number) => {
+                    const i = item.originalIndex;
+                    return (
+                      <tr key={i} className="hover:bg-brand-surface/50 transition-colors group">
+                        <td className="sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 text-center w-[48px] font-black text-brand-muted/40 text-[10px] border-b border-brand-border/10">{idx + 1}</td>
+                        <td className="sticky left-[48px] bg-white group-hover:bg-slate-50 transition-colors z-20 py-4 px-2 border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] min-w-[180px] max-w-[180px] truncate border-b border-brand-border/10">
+                          <input
+                            className="w-full bg-transparent font-black uppercase tracking-tight text-[12px] text-brand-dark focus:outline-none"
+                            value={item.team}
+                            onChange={(e) => {
+                              const newRecap = [...data.recap_smp];
+                              newRecap[i].team = e.target.value;
+                              setData({ ...data, recap_smp: newRecap });
+                            }}
+                          />
+                        </td>
+                        <td className="py-4 px-4 border-b border-brand-border/10">
+                          <input
+                            className="w-20 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-[11px] focus:outline-none"
+                            value={item.tent_no || ""}
+                            onChange={(e) => {
+                              const newRecap = [...data.recap_smp];
+                              newRecap[i].tent_no = e.target.value;
+                              setData({ ...data, recap_smp: newRecap });
+                            }}
+                          />
+                        </td>
+                        {Array.from({ length: 20 }).map((_, sIdx) => (
+                          <td key={sIdx} className="py-2 px-1 border-b border-brand-border/10">
+                            <input
+                              type="number"
+                              className="w-14 bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
+                              value={item.scores[sIdx] || 0}
+                              onChange={(e) => {
+                                const newRecap = [...data.recap_smp];
+                                const val = parseInt(e.target.value) || 0;
+                                newRecap[i].scores[sIdx] = val;
+                                // Recalculate total
+                                newRecap[i].total = newRecap[i].scores.reduce((a: number, b: number) => a + b, 0);
+                                setData({ ...data, recap_smp: newRecap });
+                              }}
+                            />
+                          </td>
+                        ))}
+                        <td className="py-4 px-4 text-right border-b border-brand-border/10">
+                          <span className="font-black text-[14px] tracking-tighter text-brand-primary">{item.total}</span>
+                        </td>
+                        <td className="py-4 px-4 text-right border-b border-brand-border/10">
+                          <button
+                            onClick={() => {
+                              const newRecap = [...data.recap_smp];
+                              newRecap.splice(i, 1);
+                              setData({ ...data, recap_smp: newRecap });
+                            }}
+                            className="p-2 text-slate-300 hover:text-brand-primary transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
+              </tbody>
+            </table>
+          </div>
+          <button
+            onClick={() => {
+              const prefixName = activeRecapTabSmp === "putra" ? "Regu Baru (Putra)" : "Regu Baru (Putri)";
+              const prefixCargo = activeRecapTabSmp === "putra" ? "PA-" : "PI-";
+              setData({ 
+                ...data, 
+                recap_smp: [...data.recap_smp, { 
+                  rank: data.recap_smp.length + 1, 
+                  team: prefixName, 
+                  tent_no: prefixCargo, 
+                  scores: Array(20).fill(0),
+                  total: 0 
+                }] 
+              });
+            }}
+            className="mt-8 w-full p-6 border border-dashed border-brand-border rounded-3xl text-[10px] font-black uppercase tracking-[0.3em] text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Tambah Baris Regu {activeRecapTabSmp === "putra" ? "Putra" : "Putri"} (SMP/MTs)
           </button>
         </section>
 
