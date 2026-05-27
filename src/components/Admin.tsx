@@ -169,6 +169,20 @@ export default function Admin() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const logoUrl = data?.settings?.logo_url || "https://i.imgur.com/3jPMvNa.png";
+    const favicon = document.querySelector("link[rel*='icon']");
+    if (favicon) {
+      (favicon as HTMLLinkElement).href = logoUrl;
+    } else {
+      const link = document.createElement("link");
+      link.rel = "icon";
+      link.type = "image/png";
+      link.href = logoUrl;
+      document.head.appendChild(link);
+    }
+  }, [data?.settings?.logo_url]);
+
   const loadFromLocalApi = () => {
     fetch("/api/data")
       .then((res) => {

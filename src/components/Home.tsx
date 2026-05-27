@@ -133,6 +133,20 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const logoUrl = siteData?.settings?.logo_url || "https://i.imgur.com/3jPMvNa.png";
+    const favicon = document.querySelector("link[rel*='icon']");
+    if (favicon) {
+      (favicon as HTMLLinkElement).href = logoUrl;
+    } else {
+      const link = document.createElement("link");
+      link.rel = "icon";
+      link.type = "image/png";
+      link.href = logoUrl;
+      document.head.appendChild(link);
+    }
+  }, [siteData?.settings?.logo_url]);
+
+  useEffect(() => {
     if (!siteData?.slides?.length) return;
     
     const slideTimer = setInterval(() => {
