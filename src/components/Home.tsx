@@ -160,8 +160,155 @@ export default function Home() {
 
   const { schedule, recap_sd: rawRecapSd, recap_smp: rawRecapSmp, settings, slides = [], news = [] } = siteData;
 
-  // Ensure exactly 32 teams are always returned and configured
-  const ensure32Teams = (recapList: any[]): any[] => {
+  // Ensure exactly 64 teams are returned for SD/MI (32 Putra and 32 Putri)
+  const ensure64TeamsForSd = (recapList: any[], numScores = 23): any[] => {
+    const list = recapList || [];
+    
+    // Default 32 Putra
+    const defaultPutra = [
+      { team: "Regu Garuda (Putra)", tent_no: "PA-01" },
+      { team: "Regu Elang (Putra)", tent_no: "PA-02" },
+      { team: "Regu Rajawali (Putra)", tent_no: "PA-03" },
+      { team: "Regu Harimau (Putra)", tent_no: "PA-04" },
+      { team: "Regu Singa (Putra)", tent_no: "PA-05" },
+      { team: "Regu Beruang (Putra)", tent_no: "PA-06" },
+      { team: "Regu Banteng (Putra)", tent_no: "PA-07" },
+      { team: "Regu Kobra (Putra)", tent_no: "PA-08" },
+      { team: "Regu Scorpion (Putra)", tent_no: "PA-09" },
+      { team: "Regu Kancil (Putra)", tent_no: "PA-10" },
+      { team: "Regu Kelelawar (Putra)", tent_no: "PA-11" },
+      { team: "Regu Serigala (Putra)", tent_no: "PA-12" },
+      { team: "Regu Hiu (Putra)", tent_no: "PA-13" },
+      { team: "Regu Lumba (Putra)", tent_no: "PA-14" },
+      { team: "Regu Rusa (Putra)", tent_no: "PA-15" },
+      { team: "Regu Singa Emas (Putra)", tent_no: "PA-16" },
+      { team: "Regu Cheetah (Putra)", tent_no: "PA-17" },
+      { team: "Regu Jaguar (Putra)", tent_no: "PA-18" },
+      { team: "Regu Panther (Putra)", tent_no: "PA-19" },
+      { team: "Regu Falcon (Putra)", tent_no: "PA-20" },
+      { team: "Regu Condor (Putra)", tent_no: "PA-21" },
+      { team: "Regu Cobra (Putra)", tent_no: "PA-22" },
+      { team: "Regu Scorpion Merah (Putra)", tent_no: "PA-23" },
+      { team: "Regu Macan (Putra)", tent_no: "PA-24" },
+      { team: "Regu Serigala Putih (Putra)", tent_no: "PA-25" },
+      { team: "Regu Elang Laut (Putra)", tent_no: "PA-26" },
+      { team: "Regu Hiu Putih (Putra)", tent_no: "PA-27" },
+      { team: "Regu Lumba-Lumba (Putra)", tent_no: "PA-28" },
+      { team: "Regu Banteng Hitam (Putra)", tent_no: "PA-29" },
+      { team: "Regu Komodo (Putra)", tent_no: "PA-30" },
+      { team: "Regu Rajawali Sakti (Putra)", tent_no: "PA-31" },
+      { team: "Regu Garuda Emas (Putra)", tent_no: "PA-32" }
+    ];
+
+    // Default 32 Putri
+    const defaultPutri = [
+      { team: "Regu Melati (Putri)", tent_no: "PI-01" },
+      { team: "Regu Mawar (Putri)", tent_no: "PI-02" },
+      { team: "Regu Dahlia (Putri)", tent_no: "PI-03" },
+      { team: "Regu Anggrek (Putri)", tent_no: "PI-04" },
+      { team: "Regu Tulip (Putri)", tent_no: "PI-05" },
+      { team: "Regu Sakura (Putri)", tent_no: "PI-06" },
+      { team: "Regu Teratai (Putri)", tent_no: "PI-07" },
+      { team: "Regu Lavender (Putri)", tent_no: "PI-08" },
+      { team: "Regu Lily (Putri)", tent_no: "PI-09" },
+      { team: "Regu Aster (Putri)", tent_no: "PI-10" },
+      { team: "Regu Kenanga (Putri)", tent_no: "PI-11" },
+      { team: "Regu Kamboja (Putri)", tent_no: "PI-12" },
+      { team: "Regu Bougenville (Putri)", tent_no: "PI-13" },
+      { team: "Regu Flamboyan (Putri)", tent_no: "PI-14" },
+      { team: "Regu Edelweis (Putri)", tent_no: "PI-15" },
+      { team: "Regu Matahari (Putri)", tent_no: "PI-16" },
+      { team: "Regu Jasmine (Putri)", tent_no: "PI-17" },
+      { team: "Regu Orchid (Putri)", tent_no: "PI-18" },
+      { team: "Regu Camelia (Putri)", tent_no: "PI-19" },
+      { team: "Regu Magnolia (Putri)", tent_no: "PI-20" },
+      { team: "Regu Dahlia Putih (Putri)", tent_no: "PI-21" },
+      { team: "Regu Sakura Merah (Putri)", tent_no: "PI-22" },
+      { team: "Regu Lily Putih (Putri)", tent_no: "PI-23" },
+      { team: "Regu Tulip Merah (Putri)", tent_no: "PI-24" },
+      { team: "Regu Rosela (Putri)", tent_no: "PI-25" },
+      { team: "Regu Saffron (Putri)", tent_no: "PI-26" },
+      { team: "Regu Lavender Biru (Putri)", tent_no: "PI-27" },
+      { team: "Regu Anggrek Bulan (Putri)", tent_no: "PI-28" },
+      { team: "Regu Kenanga Harum (Putri)", tent_no: "PI-29" },
+      { team: "Regu Teratai Putih (Putri)", tent_no: "PI-30" },
+      { team: "Regu Melati Suci (Putri)", tent_no: "PI-31" },
+      { team: "Regu Mawar Merah (Putri)", tent_no: "PI-32" }
+    ];
+
+    const incomingPutra = list.filter((item: any) => 
+      item && item.team && (item.team.toLowerCase().includes("putra") || 
+      (item.tent_no && item.tent_no.toUpperCase().startsWith("PA")))
+    );
+
+    const incomingPutri = list.filter((item: any) => 
+      item && item.team && (item.team.toLowerCase().includes("putri") || 
+      (item.tent_no && item.tent_no.toUpperCase().startsWith("PI")))
+    );
+
+    const incomingOthers = list.filter((item: any) => 
+      item && item.team && 
+      !item.team.toLowerCase().includes("putra") && 
+      !(item.tent_no && item.tent_no.toUpperCase().startsWith("PA")) &&
+      !item.team.toLowerCase().includes("putri") && 
+      !(item.tent_no && item.tent_no.toUpperCase().startsWith("PI"))
+    );
+
+    const putraResult = [...incomingPutra];
+    while (putraResult.length < 32) {
+      const idx = putraResult.length;
+      const nextDefault = defaultPutra.find(d => !putraResult.some(p => p.tent_no === d.tent_no)) 
+        || defaultPutra[idx] 
+        || { team: `Regu Putra ${idx + 1}`, tent_no: `PA-${idx + 1 < 10 ? '0' + (idx + 1) : idx + 1}` };
+      
+      putraResult.push({
+        rank: idx + 1,
+        team: nextDefault.team,
+        tent_no: nextDefault.tent_no,
+        scores: Array(numScores).fill(0),
+        total: 0
+      });
+    }
+
+    const putriResult = [...incomingPutri];
+    while (putriResult.length < 32) {
+      const idx = putriResult.length;
+      const nextDefault = defaultPutri.find(d => !putriResult.some(p => p.tent_no === d.tent_no)) 
+        || defaultPutri[idx] 
+        || { team: `Regu Putri ${idx + 1}`, tent_no: `PI-${idx + 1 < 10 ? '0' + (idx + 1) : idx + 1}` };
+
+      putriResult.push({
+        rank: idx + 1,
+        team: nextDefault.team,
+        tent_no: nextDefault.tent_no,
+        scores: Array(numScores).fill(0),
+        total: 0
+      });
+    }
+
+    const combined = [...putraResult.slice(0, 32), ...putriResult.slice(0, 32), ...incomingOthers];
+
+    return combined.map((item, index) => {
+      let scores = Array.isArray(item.scores)
+        ? item.scores.map((s: any) => Number(s) || 0)
+        : Array(numScores).fill(0);
+      if (scores.length < numScores) {
+        scores = [...scores, ...Array(numScores - scores.length).fill(0)];
+      } else if (scores.length > numScores) {
+        scores = scores.slice(0, numScores);
+      }
+      const total = scores.reduce((sum: number, val: number) => sum + val, 0);
+      return {
+        ...item,
+        rank: index + 1,
+        scores,
+        total
+      };
+    });
+  };
+
+  // Ensure exactly 32 teams are always returned and configured for other categories
+  const ensure32Teams = (recapList: any[], numScores = 20): any[] => {
     const list = recapList || [];
     const defaultTeams = [
       { team: "Regu Garuda (Putra)", tent_no: "PA-01" },
@@ -205,16 +352,21 @@ export default function Home() {
         rank: idx + 1,
         team: defaultTeams[idx]?.team || `Regu ${idx + 1}`,
         tent_no: defaultTeams[idx]?.tent_no || `-`,
-        scores: Array(20).fill(0),
+        scores: Array(numScores).fill(0),
         total: 0
       });
     }
 
     // Ensure scores are arrays of numbers and total contains the correct sum
     return result.slice(0, 32).map(item => {
-      const scores = Array.isArray(item.scores)
+      let scores = Array.isArray(item.scores)
         ? item.scores.map((s: any) => Number(s) || 0)
-        : Array(20).fill(0);
+        : Array(numScores).fill(0);
+      if (scores.length < numScores) {
+        scores = [...scores, ...Array(numScores - scores.length).fill(0)];
+      } else if (scores.length > numScores) {
+        scores = scores.slice(0, numScores);
+      }
       const total = scores.reduce((sum: number, val: number) => sum + val, 0);
       return {
         ...item,
@@ -224,7 +376,7 @@ export default function Home() {
     });
   };
 
-  const recapSd = ensure32Teams(rawRecapSd || (siteData as any).recap);
+  const recapSd = ensure64TeamsForSd(rawRecapSd || (siteData as any).recap, 23);
   const recapSdPutra = recapSd
     .filter((item: any) => 
       item.team.toLowerCase().includes("putra") || 
@@ -239,7 +391,7 @@ export default function Home() {
     )
     .sort((a, b) => b.total - a.total);
 
-  const recapSmp = ensure32Teams(rawRecapSmp || (siteData as any).recap);
+  const recapSmp = ensure32Teams(rawRecapSmp || (siteData as any).recap, 20);
   const recapSmpPutra = recapSmp
     .filter((item: any) => 
       item.team.toLowerCase().includes("putra") || 
@@ -713,8 +865,8 @@ export default function Home() {
                     <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
                     <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
-                    {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                    {Array.from({ length: 23 }).map((_, i) => (
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">{i + 1 < 10 ? 'L-0' : 'L-'}{i + 1}</th>
                     ))}
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
                   </tr>
@@ -743,7 +895,7 @@ export default function Home() {
               </table>
             </div>
             <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-20 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-23 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
             </div>
           </div>
@@ -761,8 +913,8 @@ export default function Home() {
                     <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
                     <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
-                    {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                    {Array.from({ length: 23 }).map((_, i) => (
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">{i + 1 < 10 ? 'L-0' : 'L-'}{i + 1}</th>
                     ))}
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
                   </tr>
@@ -791,7 +943,7 @@ export default function Home() {
               </table>
             </div>
             <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-20 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">L-01 s/d L-23 merupakan kode Mata Lomba sesuai Petunjuk Teknis.</p>
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
             </div>
           </div>
@@ -820,7 +972,7 @@ export default function Home() {
                     <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">{i + 1 < 10 ? 'L-0' : 'L-'}{i + 1}</th>
                     ))}
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
                   </tr>
@@ -868,7 +1020,7 @@ export default function Home() {
                     <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
                     {Array.from({ length: 20 }).map((_, i) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">L-0{i + 1}</th>
+                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border">{i + 1 < 10 ? 'L-0' : 'L-'}{i + 1}</th>
                     ))}
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
                   </tr>
