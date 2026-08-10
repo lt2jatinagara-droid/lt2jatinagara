@@ -115,20 +115,46 @@ export default function Home() {
         setLoading(false);
       });
 
-    // Real-time sync with Cloud (Firebase)
-    const unsubscribe = onSnapshot(doc(db, "settings", "site"), (docSnap) => {
+    // Real-time sync with Cloud (Firebase) - multi-document support
+    let latestCloudData: any = {};
+
+    const syncCloudData = () => {
+      setSiteData(mergeWithFallback(latestCloudData, loadedLocal));
+      setLoading(false);
+    };
+
+    const unsubSite = onSnapshot(doc(db, "settings", "site"), (docSnap) => {
       if (docSnap.exists()) {
-        const cloudData = docSnap.data();
-        setSiteData(mergeWithFallback(cloudData, loadedLocal));
-        setLoading(false);
+        latestCloudData = { ...latestCloudData, ...docSnap.data() };
+        syncCloudData();
       }
     }, (error) => {
-      console.warn("Firebase sync error:", error.message);
+      console.warn("Firebase site sync error:", error.message);
+    });
+
+    const unsubSlides = onSnapshot(doc(db, "settings", "slides"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data()?.slides) {
+        latestCloudData = { ...latestCloudData, slides: docSnap.data().slides };
+        syncCloudData();
+      }
+    }, (error) => {
+      console.warn("Firebase slides sync error:", error.message);
+    });
+
+    const unsubNews = onSnapshot(doc(db, "settings", "news"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data()?.news) {
+        latestCloudData = { ...latestCloudData, news: docSnap.data().news };
+        syncCloudData();
+      }
+    }, (error) => {
+      console.warn("Firebase news sync error:", error.message);
     });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      unsubscribe();
+      unsubSite();
+      unsubSlides();
+      unsubNews();
     };
   }, []);
 
@@ -1097,11 +1123,30 @@ export default function Home() {
             <div>
               <div className="inline-block bg-brand-dark text-white text-[10px] font-bold px-3 py-1 rounded uppercase tracking-[0.3em] mb-6 italic">Venue Utama</div>
               <h2 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase mb-6">Informasi <br /><span className="text-brand-primary">Lokasi</span></h2>
-
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center text-brand-primary shrink-0 mt-1">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black uppercase text-black tracking-tight">Circuit Cikande</h3>
+                    <p className="text-brand-muted text-xs font-semibold uppercase tracking-wider mt-1">Desa Cikande, Kec. Jatinagara, Kab. Ciamis, Jawa Barat</p>
+                  </div>
+                </div>
+              </div>
+              <a 
+                href="https://www.google.com/maps/place/Circuit+Cikande/@-7.1862331,108.4090704,864m/data=!3m1!1e3!4m14!1m7!3m6!1s0x2e6f430fc06ead6d:0x6b3a3087db0e9634!2sCircuit+Cikande!8m2!3d-7.1862331!4d108.4116453!16s%2Fg%2F11g0gqz94x" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-brand-primary text-white text-xs font-black px-6 py-3.5 rounded-2xl uppercase tracking-widest shadow-lg hover:bg-brand-primary/90 transition-all"
+              >
+                <span>Buka di Google Maps</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
             <div className="rounded-[40px] overflow-hidden shadow-2xl aspect-[4/5] bg-brand-surface border border-brand-border relative group">
               <iframe 
-                src="https://maps.google.com/maps?q=SMPN%201%20Jatinagara%2C%20Ciamis&t=h&z=17&output=embed" 
+                src="https://maps.google.com/maps?q=Circuit%20Cikande%2C%20Jatinagara%2C%20Ciamis&t=h&z=17&output=embed" 
                 className="w-full h-full border-0 transition-all duration-1000" 
                 allowFullScreen={true} 
                 loading="lazy" 

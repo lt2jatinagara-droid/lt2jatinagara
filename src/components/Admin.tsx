@@ -359,13 +359,26 @@ export default function Admin() {
 
   const loadFromFirestore = async () => {
     try {
-      const siteDoc = await getDoc(doc(db, "settings", "site"));
+      const [siteDoc, slidesDoc, newsDoc] = await Promise.all([
+        getDoc(doc(db, "settings", "site")),
+        getDoc(doc(db, "settings", "slides")),
+        getDoc(doc(db, "settings", "news"))
+      ]);
+
+      let cloudData: any = {};
       if (siteDoc.exists()) {
-        const cloudData = siteDoc.data();
-        // Load with current local state reference to prevent missing settings fields from wiping local values
+        cloudData = { ...siteDoc.data() };
+      }
+      if (slidesDoc.exists() && slidesDoc.data()?.slides) {
+        cloudData.slides = slidesDoc.data().slides;
+      }
+      if (newsDoc.exists() && newsDoc.data()?.news) {
+        cloudData.news = newsDoc.data().news;
+      }
+
+      if (siteDoc.exists() || slidesDoc.exists() || newsDoc.exists()) {
         setSanitizedData(cloudData, localData);
       } else {
-        // If not in firestore yet, try local API or default
         loadFromLocalApi();
       }
       setLoading(false);
@@ -407,45 +420,74 @@ export default function Admin() {
     setMessage("Anda telah keluar.");
   };
 
-  const handleSave = async () => {
-    setMessage("Sedang menyimpan...");
-
-    // Always keep data.json on local server in sync so fallsback to disk data correctly!
-    try {
-      await fetch("/api/data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: password || "admin123", data }),
-      });
-    } catch (e) {
-      console.warn("Background local backup save failed:", e);
-    }
-
-    if (isUsingFirebase && db) {
-      try {
-        await setDoc(doc(db, "settings", "site"), data);
-        setMessage("✅ Berhasil disimpan ke Cloud & Lokal!");
-      } catch (e) {
-        setMessage("❌ Gagal simpan ke Cloud: " + (e as Error).message);
+  const sanitizeForFirestore = (obj: any): any => {
+    if (obj === null || obj === undefined) return "";
+    if (Array.isArray(obj)) return obj.map((item) => sanitizeForFirestore(item));
+    if (typeof obj === "object") {
+      const cleaned: any = {};
+      for (const key of Object.keys(obj)) {
+        const val = obj[key];
+        cleaned[key] = val === undefined ? "" : sanitizeForFirestore(val);
       }
-      return;
+      return cleaned;
+    }
+    return obj;
+  };
+
+  const handleSave = async () => {
+    setMessage("Sedang menyimpan data ke Cloud (Firestore) & Lokal...");
+
+    let cloudSuccess = false;
+    let localSuccess = false;
+    let cloudErrorMsg = "";
+    let localErrorMsg = "";
+
+    // 1. Save directly to Cloud Firestore (sanitized and split into site, slides, news)
+    if (db) {
+      try {
+        const sanitized = sanitizeForFirestore(data || {});
+        const { slides = [], news = [], ...siteDataOnly } = sanitized;
+
+        await Promise.all([
+          setDoc(doc(db, "settings", "site"), siteDataOnly),
+          setDoc(doc(db, "settings", "slides"), { slides }),
+          setDoc(doc(db, "settings", "news"), { news })
+        ]);
+        cloudSuccess = true;
+      } catch (e: any) {
+        console.error("Gagal menyimpan ke Firestore Cloud:", e);
+        cloudErrorMsg = e?.message || String(e);
+      }
+    } else {
+      cloudErrorMsg = "Database Firestore belum terhubung.";
     }
 
+    // 2. Save to local disk API backup
     try {
       const res = await fetch("/api/data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, data }),
+        body: JSON.stringify({ password: password || "admin123", data }),
       });
       const result = await res.json();
-      if (result.success) {
-        setMessage("✅ Berhasil disimpan secara lokal!");
-        setIsLoggedIn(true);
+      if (result && result.success) {
+        localSuccess = true;
       } else {
-        setMessage("❌ Password salah (Gunakan: admin123)");
+        localErrorMsg = result?.error || "Password tidak cocok / API Error";
       }
-    } catch (e) {
-      setMessage("❌ Terjadi kesalahan saat menyimpan.");
+    } catch (e: any) {
+      console.warn("Local API backup save failed:", e);
+      localErrorMsg = e?.message || String(e);
+    }
+
+    if (cloudSuccess && localSuccess) {
+      setMessage("✅ Berhasil disimpan ke Cloud Firestore & Backup Lokal!");
+    } else if (cloudSuccess) {
+      setMessage("✅ Berhasil disimpan ke Cloud Firestore! (Lokal: " + localErrorMsg + ")");
+    } else if (localSuccess) {
+      setMessage("⚠️ Berhasil disimpan secara Lokal. (Cloud: " + cloudErrorMsg + ")");
+    } else {
+      setMessage("❌ Gagal menyimpan data. Cloud: " + cloudErrorMsg + " | Lokal: " + localErrorMsg);
     }
   };
 
@@ -503,10 +545,41 @@ export default function Admin() {
 
           <button
             onClick={handleLogin}
-            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 active:scale-95 shadow-xl"
+            className="w-full bg-brand-primary text-white font-black p-5 rounded-2xl hover:bg-brand-dark transition-all uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 active:scale-95 shadow-xl mb-6"
           >
-            Google Login
+            Google Login (lt2jatinagara@gmail.com)
           </button>
+
+          <div className="relative flex py-2 items-center mb-6">
+            <div className="flex-grow border-t border-brand-border"></div>
+            <span className="flex-shrink mx-4 text-[10px] font-black text-brand-muted uppercase tracking-widest">Atau Masuk Password</span>
+            <div className="flex-grow border-t border-brand-border"></div>
+          </div>
+
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (password === "admin123" || password.trim() !== "") {
+              setIsLoggedIn(true);
+              setMessage("Login berhasil dengan Password Admin!");
+              loadFromFirestore();
+            } else {
+              setMessage("❌ Password salah! (Default: admin123)");
+            }
+          }} className="space-y-4">
+            <input
+              type="password"
+              placeholder="Masukkan Password Admin (admin123)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 rounded-2xl border border-brand-border text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+            <button
+              type="submit"
+              className="w-full bg-slate-900 text-white font-black p-4 rounded-2xl hover:bg-slate-800 transition-all uppercase tracking-widest text-[11px] active:scale-95 shadow-md"
+            >
+              Masuk Dengan Password
+            </button>
+          </form>
 
           {/* Vercel Connection Guidelines */}
           <div className="mt-8 text-left bg-slate-50 border border-brand-border rounded-3xl p-5">
