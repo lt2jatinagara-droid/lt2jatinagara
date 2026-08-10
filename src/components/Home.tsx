@@ -1197,12 +1197,8 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-brand-border py-1.5 px-3 md:py-2 md:px-6 flex flex-row flex-wrap justify-between items-center gap-2 text-[8px] md:text-[9px] font-black uppercase tracking-wider text-brand-muted shadow-lg">
-            <p className="truncate max-w-[220px] sm:max-w-none">© {settings.year} KWARRAN JATINAGARA. MuhammadImamSyafi'i.</p>
-            <div className="flex gap-3 sm:gap-6 shrink-0">
-              <a href="#" className="hover:text-black transition-colors italic">Privacy Policy</a>
-              <a href="#" className="hover:text-black transition-colors italic">Terms of Service</a>
-            </div>
+          <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-brand-border py-1.5 px-3 md:py-2 md:px-6 flex justify-center items-center text-[9px] md:text-[10px] font-medium normal-case tracking-wider text-brand-muted shadow-lg">
+            <p className="truncate text-center">© {settings.year} kwarran jatinagara. muhammadimamsyafi'i.</p>
           </div>
         </div>
       </footer>
