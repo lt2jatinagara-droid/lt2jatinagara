@@ -1197,9 +1197,9 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted">
-            <p>© {settings.year} KWARRAN JATINAGARA. MuhammadImamSyafi'i.</p>
-            <div className="flex gap-8">
+          <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-brand-border py-1.5 px-3 md:py-2 md:px-6 flex flex-row flex-wrap justify-between items-center gap-2 text-[8px] md:text-[9px] font-black uppercase tracking-wider text-brand-muted shadow-lg">
+            <p className="truncate max-w-[220px] sm:max-w-none">© {settings.year} KWARRAN JATINAGARA. MuhammadImamSyafi'i.</p>
+            <div className="flex gap-3 sm:gap-6 shrink-0">
               <a href="#" className="hover:text-black transition-colors italic">Privacy Policy</a>
               <a href="#" className="hover:text-black transition-colors italic">Terms of Service</a>
             </div>
@@ -1212,7 +1212,7 @@ export default function Home() {
         href="https://wa.me/6285316377589" 
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-10 right-10 z-50 bg-green-600 text-white p-5 rounded-full shadow-2xl hover:bg-green-700 hover:scale-110 active:scale-95 transition-all group"
+        className="fixed bottom-8 right-4 md:bottom-10 md:right-8 z-50 bg-green-600 text-white p-3 md:p-4 rounded-full shadow-2xl hover:bg-green-700 hover:scale-110 active:scale-95 transition-all group"
       >
         <MessageCircle className="w-6 h-6" />
         <span className="absolute right-full mr-6 bg-brand-dark text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none translate-x-4 group-hover:translate-x-0">
