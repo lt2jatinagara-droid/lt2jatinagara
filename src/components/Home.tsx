@@ -21,7 +21,9 @@ import {
   MessageCircle,
   ExternalLink,
   Globe,
-  MoreVertical
+  MoreVertical,
+  FileText,
+  Download
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -1100,7 +1102,7 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-6">
                     <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-primary shadow-sm group-hover:scale-110 transition-transform">
-                       <Mail className="w-6 h-6" />
+                       <FileText className="w-6 h-6" />
                     </div>
                     <div>
                       <h4 className="font-black uppercase tracking-tight text-black mb-1">{doc.title}</h4>
@@ -1129,13 +1131,13 @@ export default function Home() {
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black uppercase text-black tracking-tight">Circuit Cikande</h3>
-                    <p className="text-brand-muted text-xs font-semibold uppercase tracking-wider mt-1">Desa Cikande, Kec. Jatinagara, Kab. Ciamis, Jawa Barat</p>
+                    <h3 className="text-xl font-black uppercase text-black tracking-tight">Pondok Pesantren Sabilurrosyad</h3>
+                    <p className="text-brand-muted text-xs font-semibold uppercase tracking-wider mt-1">Kec. Jatinagara, Kab. Ciamis, Jawa Barat</p>
                   </div>
                 </div>
               </div>
               <a 
-                href="https://www.google.com/maps/place/Circuit+Cikande/@-7.1862331,108.4090704,864m/data=!3m1!1e3!4m14!1m7!3m6!1s0x2e6f430fc06ead6d:0x6b3a3087db0e9634!2sCircuit+Cikande!8m2!3d-7.1862331!4d108.4116453!16s%2Fg%2F11g0gqz94x" 
+                href="https://maps.app.goo.gl/kjoqLwsRuRKLGja4A" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-brand-primary text-white text-xs font-black px-6 py-3.5 rounded-2xl uppercase tracking-widest shadow-lg hover:bg-brand-primary/90 transition-all"
@@ -1146,7 +1148,7 @@ export default function Home() {
             </div>
             <div className="rounded-[40px] overflow-hidden shadow-2xl aspect-[4/5] bg-brand-surface border border-brand-border relative group">
               <iframe 
-                src="https://maps.google.com/maps?q=Circuit%20Cikande%2C%20Jatinagara%2C%20Ciamis&t=h&z=17&output=embed" 
+                src="https://maps.google.com/maps?q=-7.175580,108.388238&t=h&z=17&output=embed" 
                 className="w-full h-full border-0 transition-all duration-1000" 
                 allowFullScreen={true} 
                 loading="lazy" 

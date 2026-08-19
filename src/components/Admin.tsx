@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Plus, Trash2, ArrowLeft, LogOut, LogIn } from "lucide-react";
+import { Save, Plus, Trash2, ArrowLeft, LogOut, LogIn, Upload, ChevronUp, ChevronDown, ChevronsUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
@@ -521,6 +521,31 @@ export default function Admin() {
         }
       };
       img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDocumentUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const fileUrl = e.target?.result as string;
+      const sizeInMb = (file.size / (1024 * 1024)).toFixed(1);
+      const sizeInKb = (file.size / 1024).toFixed(0);
+      const formattedSize = file.size >= 1024 * 1024 ? `${sizeInMb} MB` : `${sizeInKb} KB`;
+      const extension = file.name.split(".").pop()?.toUpperCase() || "PDF";
+      const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
+
+      const newDoc = {
+        title: nameWithoutExt,
+        type: extension,
+        size: formattedSize,
+        url: fileUrl,
+        createdAt: Date.now()
+      };
+
+      const updatedDocs = [newDoc, ...(data.documents || [])];
+      setData({ ...data, documents: updatedDocs });
+      setMessage(`📄 Dokumen "${nameWithoutExt}" berhasil diupload dan diletakkan paling atas!`);
     };
     reader.readAsDataURL(file);
   };
@@ -1325,24 +1350,45 @@ export default function Admin() {
 
         {/* Documents Section */}
         <section className="bg-white p-10 rounded-[40px] border border-brand-border shadow-xl">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-brand-primary">Kelola Dokumen Unduhan</h2>
-            <button
-              onClick={() => {
-                const newDocs = [...(data.documents || [])];
-                newDocs.push({ 
-                  title: "Dokumen Baru", 
-                  type: "PDF", 
-                  size: "1.0 MB", 
-                  url: "" 
-                });
-                setData({ ...data, documents: newDocs });
-              }}
-              className="p-3 bg-brand-surface rounded-full text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
-            >
-              <Plus className="w-4 h-4" />
-              Tambah Dokumen
-            </button>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+              <h2 className="text-2xl font-black uppercase tracking-tighter italic text-brand-primary">Kelola Dokumen Unduhan</h2>
+              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest mt-1">Dokumen baru yang ditambahkan/diupload otomatis berada di urutan paling atas</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="p-3 px-5 bg-brand-primary rounded-2xl text-white hover:bg-brand-dark transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-md active:scale-95">
+                <Upload className="w-4 h-4" />
+                Upload File Baru
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleDocumentUpload(file);
+                      e.target.value = "";
+                    }
+                  }}
+                />
+              </label>
+              <button
+                onClick={() => {
+                  const newDoc = { 
+                    title: "Dokumen Baru", 
+                    type: "PDF", 
+                    size: "1.0 MB", 
+                    url: "",
+                    createdAt: Date.now()
+                  };
+                  const newDocs = [newDoc, ...(data.documents || [])];
+                  setData({ ...data, documents: newDocs });
+                }}
+                className="p-3 px-5 bg-brand-surface rounded-2xl text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border border-brand-border"
+              >
+                <Plus className="w-4 h-4" />
+                Tambah Manual
+              </button>
+            </div>
           </div>
           <div className="space-y-6">
             {!(data.documents && data.documents.length) ? (
@@ -1365,17 +1411,48 @@ export default function Admin() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">URL Download / Tautan</label>
-                        <input
-                          className="w-full p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
-                          value={docItem.url || ""}
-                          placeholder="Contoh: https://drive.google.com/..."
-                          onChange={(e) => {
-                            const newDocs = [...data.documents];
-                            newDocs[idx].url = e.target.value;
-                            setData({ ...data, documents: newDocs });
-                          }}
-                        />
+                        <label className="block text-[8px] font-black uppercase tracking-widest text-brand-muted mb-1 font-sans">URL Download / Tautan (atau Upload File)</label>
+                        <div className="flex gap-2">
+                          <input
+                            className="flex-1 p-3 rounded-lg bg-white border border-brand-border font-mono text-[10px]"
+                            value={docItem.url || ""}
+                            placeholder="Contoh: https://drive.google.com/... atau upload"
+                            onChange={(e) => {
+                              const newDocs = [...data.documents];
+                              newDocs[idx].url = e.target.value;
+                              setData({ ...data, documents: newDocs });
+                            }}
+                          />
+                          <label className="p-3 bg-brand-surface rounded-lg text-brand-dark border border-brand-border hover:bg-brand-primary hover:text-white cursor-pointer transition-all flex items-center justify-center shrink-0" title="Upload File untuk Dokumen Ini">
+                            <Upload className="w-4 h-4" />
+                            <input
+                              type="file"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (ev) => {
+                                    const fileUrl = ev.target?.result as string;
+                                    const sizeInMb = (file.size / (1024 * 1024)).toFixed(1);
+                                    const sizeInKb = (file.size / 1024).toFixed(0);
+                                    const formattedSize = file.size >= 1024 * 1024 ? `${sizeInMb} MB` : `${sizeInKb} KB`;
+                                    const extension = file.name.split(".").pop()?.toUpperCase() || "PDF";
+                                    const newDocs = [...data.documents];
+                                    newDocs[idx].url = fileUrl;
+                                    newDocs[idx].size = formattedSize;
+                                    newDocs[idx].type = extension;
+                                    if (!newDocs[idx].title || newDocs[idx].title === "Dokumen Baru") {
+                                      newDocs[idx].title = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
+                                    }
+                                    setData({ ...data, documents: newDocs });
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
                       </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -1407,16 +1484,64 @@ export default function Admin() {
                       </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      const newDocs = [...data.documents];
-                      newDocs.splice(idx, 1);
-                      setData({ ...data, documents: newDocs });
-                    }}
-                    className="p-3 text-brand-muted hover:text-brand-primary"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                  <div className="flex md:flex-col items-center gap-1 shrink-0 bg-white/70 p-1.5 rounded-2xl border border-brand-border/30">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => {
+                        const newDocs = [...data.documents];
+                        const [movedItem] = newDocs.splice(idx, 1);
+                        newDocs.unshift(movedItem);
+                        setData({ ...data, documents: newDocs });
+                      }}
+                      className="p-2 rounded-xl text-brand-primary hover:bg-brand-primary/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                      title="Pindah ke Paling Atas"
+                    >
+                      <ChevronsUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => {
+                        const newDocs = [...data.documents];
+                        const item = newDocs[idx];
+                        newDocs[idx] = newDocs[idx - 1];
+                        newDocs[idx - 1] = item;
+                        setData({ ...data, documents: newDocs });
+                      }}
+                      className="p-2 rounded-xl text-brand-dark hover:bg-black/5 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                      title="Geser Naik"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === data.documents.length - 1}
+                      onClick={() => {
+                        const newDocs = [...data.documents];
+                        const item = newDocs[idx];
+                        newDocs[idx] = newDocs[idx + 1];
+                        newDocs[idx + 1] = item;
+                        setData({ ...data, documents: newDocs });
+                      }}
+                      className="p-2 rounded-xl text-brand-dark hover:bg-black/5 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                      title="Geser Turun"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newDocs = [...data.documents];
+                        newDocs.splice(idx, 1);
+                        setData({ ...data, documents: newDocs });
+                      }}
+                      className="p-2 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-700 transition-all"
+                      title="Hapus Dokumen"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))
             )}
