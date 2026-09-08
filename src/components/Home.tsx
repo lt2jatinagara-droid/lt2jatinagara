@@ -439,14 +439,14 @@ export default function Home() {
 
     return combined.map((item, index) => {
       let scores = Array.isArray(item.scores)
-        ? item.scores.map((s: any) => Number(s) || 0)
+        ? item.scores.map((s: any) => Math.round((Number(s) || 0) * 100) / 100)
         : Array(numScores).fill(0);
       if (scores.length < numScores) {
         scores = [...scores, ...Array(numScores - scores.length).fill(0)];
       } else if (scores.length > numScores) {
         scores = scores.slice(0, numScores);
       }
-      const total = scores.reduce((sum: number, val: number) => sum + val, 0);
+      const total = Math.round(scores.reduce((sum: number, val: number) => sum + (Number(val) || 0), 0) * 100) / 100;
       return {
         ...item,
         tent_no: formatTentNo(item.tent_no),
@@ -540,14 +540,14 @@ export default function Home() {
     // Ensure scores are arrays of numbers and total contains the correct sum
     return combined.map((item, index) => {
       let scores = Array.isArray(item.scores)
-        ? item.scores.map((s: any) => Number(s) || 0)
+        ? item.scores.map((s: any) => Math.round((Number(s) || 0) * 100) / 100)
         : Array(numScores).fill(0);
       if (scores.length < numScores) {
         scores = [...scores, ...Array(numScores - scores.length).fill(0)];
       } else if (scores.length > numScores) {
         scores = scores.slice(0, numScores);
       }
-      const total = scores.reduce((sum: number, val: number) => sum + val, 0);
+      const total = Math.round(scores.reduce((sum: number, val: number) => sum + (Number(val) || 0), 0) * 100) / 100;
       return {
         ...item,
         rank: index + 1,
@@ -1046,17 +1046,17 @@ export default function Home() {
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putra</p>
           </div>
           <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl mb-24">
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[72vh] relative">
               <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
                   <tr className="italic text-brand-primary">
-                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
-                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    <th className="sticky top-0 left-0 bg-slate-50 z-50 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No</th>
+                    <th className="sticky top-0 left-[64px] bg-slate-50 z-50 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.08)] border-b border-brand-border">Nama Regu</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No Tenda</th>
                     {compNamesSd.map((name: string, i: number) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
+                      <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1072,10 +1072,12 @@ export default function Home() {
                       </td>
                       <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">
+                          {Number.isInteger(Number(score)) ? Number(score) : Number(Number(score).toFixed(2))}
+                        </td>
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
-                        {item.total}
+                        {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
                       </td>
                     </tr>
                   ))}
@@ -1094,17 +1096,17 @@ export default function Home() {
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putri</p>
           </div>
           <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[72vh] relative">
               <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
                   <tr className="italic text-brand-primary">
-                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
-                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    <th className="sticky top-0 left-0 bg-slate-50 z-50 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No</th>
+                    <th className="sticky top-0 left-[64px] bg-slate-50 z-50 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.08)] border-b border-brand-border">Nama Regu</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No Tenda</th>
                     {compNamesSd.map((name: string, i: number) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
+                      <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1120,10 +1122,12 @@ export default function Home() {
                       </td>
                       <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">
+                          {Number.isInteger(Number(score)) ? Number(score) : Number(Number(score).toFixed(2))}
+                        </td>
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
-                        {item.total}
+                        {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
                       </td>
                     </tr>
                   ))}
@@ -1152,17 +1156,17 @@ export default function Home() {
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putra</p>
           </div>
           <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl mb-24">
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[72vh] relative">
               <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
                   <tr className="italic text-brand-primary">
-                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
-                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    <th className="sticky top-0 left-0 bg-slate-50 z-50 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No</th>
+                    <th className="sticky top-0 left-[64px] bg-slate-50 z-50 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.08)] border-b border-brand-border">Nama Regu</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No Tenda</th>
                     {compNamesSmp.map((name: string, i: number) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
+                      <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1178,10 +1182,12 @@ export default function Home() {
                       </td>
                       <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">
+                          {Number.isInteger(Number(score)) ? Number(score) : Number(Number(score).toFixed(2))}
+                        </td>
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
-                        {item.total}
+                        {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
                       </td>
                     </tr>
                   ))}
@@ -1200,17 +1206,17 @@ export default function Home() {
             <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em] italic">Update Skor & Klasemen Regu Putri</p>
           </div>
           <div className="bg-white border border-brand-border rounded-[40px] overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[72vh] relative">
               <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none" style={{ fontSize: `${tableFontSize}px` }}>
                 <thead>
                   <tr className="italic text-brand-primary">
-                    <th className="sticky left-0 bg-slate-50 z-30 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border">No</th>
-                    <th className="sticky left-[64px] bg-slate-50 z-30 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_0_10px_-4px_rgba(0,0,0,0.05)] border-b border-brand-border">Nama Regu</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border">No Tenda</th>
+                    <th className="sticky top-0 left-0 bg-slate-50 z-50 px-4 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-center w-[64px] min-w-[64px] max-w-[64px] border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No</th>
+                    <th className="sticky top-0 left-[64px] bg-slate-50 z-50 px-2 py-4 text-[10px] font-black uppercase tracking-widest w-[100px] min-w-[100px] max-w-[100px] border-r border-brand-border shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.08)] border-b border-brand-border">Nama Regu</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">No Tenda</th>
                     {compNamesSmp.map((name: string, i: number) => (
-                      <th key={i} className="px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
+                      <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1226,10 +1232,12 @@ export default function Home() {
                       </td>
                       <td className="px-6 py-3 text-brand-muted font-bold uppercase text-[10px] tracking-widest italic border-b border-brand-border/60">{item.tent_no}</td>
                       {item.scores.map((score: number, sIdx: number) => (
-                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">{score}</td>
+                        <td key={sIdx} className="px-3 py-3 text-center text-brand-muted font-bold text-xs border-b border-brand-border/60">
+                          {Number.isInteger(Number(score)) ? Number(score) : Number(Number(score).toFixed(2))}
+                        </td>
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
-                        {item.total}
+                        {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
                       </td>
                     </tr>
                   ))}

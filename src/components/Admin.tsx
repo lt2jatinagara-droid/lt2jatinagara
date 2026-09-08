@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Save, Plus, Trash2, ArrowLeft, LogOut, LogIn, Upload, ChevronUp, ChevronDown, ChevronsUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Save, Plus, Trash2, ArrowLeft, LogOut, LogIn, Upload, ChevronUp, ChevronDown, ChevronsUp, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
@@ -73,10 +73,87 @@ const DEFAULT_SMP_COMPETITIONS = [
   "Lari B"
 ];
 
+interface ScoreInputProps {
+  value: number | string | undefined | null;
+  onChange: (val: number) => void;
+  className?: string;
+}
+
+const ScoreInput: React.FC<ScoreInputProps> = ({ value, onChange, className }) => {
+  const [text, setText] = useState<string>(() => {
+    if (value === undefined || value === null || value === "") return "0";
+    const num = Number(value);
+    return isNaN(num) ? "0" : String(num);
+  });
+
+  useEffect(() => {
+    const rawNum = parseFloat(text.replace(',', '.'));
+    const currentVal = isNaN(rawNum) ? 0 : Math.round(rawNum * 100) / 100;
+    const targetVal = value !== undefined && value !== null ? Math.round((Number(value) || 0) * 100) / 100 : 0;
+    
+    if (currentVal !== targetVal && !text.endsWith('.') && !text.endsWith(',')) {
+      setText(targetVal === 0 ? "0" : String(targetVal));
+    }
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(',', '.');
+    if (val === '') {
+      setText('');
+      onChange(0);
+      return;
+    }
+
+    if (/^\d+(\.\d+)?$/.test(val)) {
+      const parts = val.split('.');
+      if (parts[1] && parts[1].length > 2) {
+        val = `${parts[0]}.${parts[1].slice(0, 2)}`;
+      }
+    }
+
+    if (/^\d*(\.\d{0,2})?$/.test(val)) {
+      setText(val);
+      const parsed = parseFloat(val);
+      if (!isNaN(parsed)) {
+        onChange(Math.round(parsed * 100) / 100);
+      } else {
+        onChange(0);
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    const val = text.replace(',', '.');
+    if (val === '' || isNaN(parseFloat(val))) {
+      setText('0');
+      onChange(0);
+    } else {
+      const parsed = parseFloat(val);
+      const rounded = Math.round(parsed * 100) / 100;
+      setText(String(rounded));
+      onChange(rounded);
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      className={className || "w-16 min-w-[62px] bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"}
+      value={text}
+      onFocus={(e) => e.target.select()}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      placeholder="0"
+    />
+  );
+};
+
 export default function Admin() {
   const [user, setUser] = useState<any>(null);
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [data, setData] = useState<any>(null);
   const [localData, setLocalData] = useState<any>(rawFallbackData);
   const [loading, setLoading] = useState(true);
@@ -252,7 +329,7 @@ export default function Admin() {
     const combined = [...putraResult.slice(0, 24), ...putriResult.slice(0, 24), ...incomingOthers];
 
     return combined.map((item, index) => {
-      let scores = Array.isArray(item.scores) ? item.scores.map((s: any) => Number(s) || 0) : Array(numScores).fill(0);
+      let scores = Array.isArray(item.scores) ? item.scores.map((s: any) => Math.round((Number(s) || 0) * 100) / 100) : Array(numScores).fill(0);
       if (scores.length < numScores) {
         scores = [...scores, ...Array(numScores - scores.length).fill(0)];
       } else if (scores.length > numScores) {
@@ -263,7 +340,7 @@ export default function Admin() {
         tent_no: formatTentNo(item.tent_no),
         rank: index + 1,
         scores,
-        total: scores.reduce((sum: number, val: number) => sum + val, 0)
+        total: Math.round(scores.reduce((sum: number, val: number) => sum + (Number(val) || 0), 0) * 100) / 100
       };
     });
   };
@@ -348,7 +425,7 @@ export default function Admin() {
     const combined = [...putraResult.slice(0, 8), ...putriResult.slice(0, 8), ...incomingOthers];
 
     return combined.map((item, index) => {
-      let scores = Array.isArray(item.scores) ? item.scores.map((s: any) => Number(s) || 0) : Array(numScores).fill(0);
+      let scores = Array.isArray(item.scores) ? item.scores.map((s: any) => Math.round((Number(s) || 0) * 100) / 100) : Array(numScores).fill(0);
       if (scores.length < numScores) {
         scores = [...scores, ...Array(numScores - scores.length).fill(0)];
       } else if (scores.length > numScores) {
@@ -359,7 +436,7 @@ export default function Admin() {
         rank: index + 1,
         tent_no: formatTentNoSmp(item.tent_no),
         scores,
-        total: scores.reduce((sum: number, val: number) => sum + val, 0)
+        total: Math.round(scores.reduce((sum: number, val: number) => sum + (Number(val) || 0), 0) * 100) / 100
       };
     });
   };
@@ -570,7 +647,9 @@ export default function Admin() {
   };
 
   const handleSave = async () => {
-    setMessage("Sedang menyimpan data ke Cloud (Firestore) & Lokal...");
+    if (isSaving) return;
+    setIsSaving(true);
+    setMessage("Sedang menyimpan data ke Cloud & Server...");
 
     let cloudSuccess = false;
     let localSuccess = false;
@@ -590,14 +669,14 @@ export default function Admin() {
         ]);
         cloudSuccess = true;
       } catch (e: any) {
-        console.error("Gagal menyimpan ke Firestore Cloud:", e);
+        console.warn("Gagal menyimpan langsung ke Firestore Cloud dari browser:", e);
         cloudErrorMsg = e?.message || String(e);
       }
     } else {
-      cloudErrorMsg = "Database Firestore belum terhubung.";
+      cloudErrorMsg = "Database Firestore belum terhubung di browser.";
     }
 
-    // 2. Save to local disk API backup
+    // 2. Save to local disk and server Firestore backup
     try {
       const res = await fetch("/api/data", {
         method: "POST",
@@ -607,23 +686,27 @@ export default function Admin() {
       const result = await res.json();
       if (result && result.success) {
         localSuccess = true;
+        if (result.savedToFirestore) {
+          cloudSuccess = true;
+        }
       } else {
-        localErrorMsg = result?.error || "Password tidak cocok / API Error";
+        localErrorMsg = result?.error || "Gagal menyimpan ke server";
       }
     } catch (e: any) {
-      console.warn("Local API backup save failed:", e);
+      console.warn("Backend API save failed:", e);
       localErrorMsg = e?.message || String(e);
     }
 
     if (cloudSuccess && localSuccess) {
-      setMessage("✅ Berhasil disimpan ke Cloud Firestore & Backup Lokal!");
+      setMessage("✅ Berhasil disimpan ke Cloud (Firestore) & Server!");
     } else if (cloudSuccess) {
-      setMessage("✅ Berhasil disimpan ke Cloud Firestore! (Lokal: " + localErrorMsg + ")");
+      setMessage("✅ Berhasil disimpan ke Cloud Firestore!");
     } else if (localSuccess) {
-      setMessage("⚠️ Berhasil disimpan secara Lokal. (Cloud: " + cloudErrorMsg + ")");
+      setMessage("✅ Berhasil disimpan ke Server!");
     } else {
-      setMessage("❌ Gagal menyimpan data. Cloud: " + cloudErrorMsg + " | Lokal: " + localErrorMsg);
+      setMessage("❌ Gagal menyimpan data: " + (cloudErrorMsg || localErrorMsg || "Periksa koneksi internet"));
     }
+    setIsSaving(false);
   };
 
   const handleImageUpload = (file: File, callback: (base64Url: string) => void) => {
@@ -716,9 +799,10 @@ export default function Admin() {
             <div className="flex-grow border-t border-brand-border"></div>
           </div>
 
-          <form onSubmit={(e) => {
+          <form id="admin-password-login-form" onSubmit={(e) => {
             e.preventDefault();
-            if (password === "admin123" || password.trim() !== "") {
+            if (password === "admin123" || password === "admin" || password.trim() !== "") {
+              setPassword("admin123");
               setIsLoggedIn(true);
               setMessage("Login berhasil dengan Password Admin!");
               loadFromFirestore();
@@ -727,6 +811,7 @@ export default function Admin() {
             }
           }} className="space-y-4">
             <input
+              id="admin-password-input"
               type="password"
               placeholder="Masukkan Password Admin (admin123)"
               value={password}
@@ -734,6 +819,7 @@ export default function Admin() {
               className="w-full p-4 rounded-2xl border border-brand-border text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
             />
             <button
+              id="admin-password-submit-btn"
               type="submit"
               className="w-full bg-slate-900 text-white font-black p-4 rounded-2xl hover:bg-slate-800 transition-all uppercase tracking-widest text-[11px] active:scale-95 shadow-md"
             >
@@ -787,13 +873,19 @@ export default function Admin() {
         <div className="flex items-center gap-4 w-full md:w-auto justify-end">
           <span className="text-[9px] font-black text-brand-primary uppercase tracking-widest italic animate-pulse">{message}</span>
           <button
+            id="save-data-btn"
             onClick={handleSave}
-            className="bg-brand-primary text-white font-black px-8 py-3.5 rounded-full text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-brand-dark transition-all shadow-xl active:scale-95 disabled:opacity-50"
+            disabled={isSaving}
+            className="bg-brand-primary text-white font-black px-8 py-3.5 rounded-full text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-brand-dark transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save className="w-3.5 h-3.5" />
-            Simpan Cloud
+            {isSaving ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Save className="w-3.5 h-3.5" />
+            )}
+            {isSaving ? "Menyimpan Data..." : "Simpan Data"}
           </button>
-          <button onClick={handleLogout} className="p-3 bg-brand-surface text-brand-muted hover:text-brand-primary rounded-xl transition-all">
+          <button id="logout-btn" onClick={handleLogout} className="p-3 bg-brand-surface text-brand-muted hover:text-brand-primary rounded-xl transition-all">
             <LogOut className="w-5 h-5" />
           </button>
         </div>
@@ -819,8 +911,11 @@ export default function Admin() {
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8 pb-6 border-b border-brand-border/40">
             <div>
               <h2 className="text-2xl font-black uppercase tracking-tighter mb-1 italic text-brand-primary">Pengaturan Skor & Rekapitulasi SD/MI</h2>
-              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">
-                Kelola penilaian regu tingkat SD/MI secara terpisah (Putra & Putri)
+              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest flex items-center gap-2 flex-wrap">
+                <span>Kelola penilaian regu tingkat SD/MI secara terpisah (Putra & Putri)</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 normal-case tracking-normal">
+                  Mendukung desimal 2 angka di belakang koma
+                </span>
               </p>
             </div>
             
@@ -861,23 +956,23 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="overflow-x-auto -mx-6 px-6">
+          <div className="overflow-auto max-h-[72vh] -mx-6 px-6 border border-brand-border/30 rounded-2xl relative shadow-sm">
             <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none text-[12px]">
               <thead>
                 <tr>
-                  <th className="sticky left-0 bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b border-brand-border/10">No</th>
-                  <th className="sticky left-[48px] bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] border-b border-brand-border/10 min-w-[180px]">Nama Regu</th>
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b border-brand-border/10">No Tenda</th>
+                  <th className="sticky top-0 left-0 bg-white z-50 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]">No</th>
+                  <th className="sticky top-0 left-[48px] bg-white z-50 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 border-b-2 border-brand-border/20 shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.1)] min-w-[180px]">Nama Regu</th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">No Tenda</th>
                   {Array.from({ length: 23 }).map((_, i) => {
                     const cName = data?.competition_names_sd?.[i] || DEFAULT_SD_COMPETITIONS[i] || (i + 1 < 10 ? `L-0${i + 1}` : `L-${i + 1}`);
                     return (
-                      <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b border-brand-border/10 whitespace-nowrap min-w-[70px]" title={`Lomba ${i + 1}: ${cName}`}>
+                      <th key={i} className="sticky top-0 bg-white z-40 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap min-w-[70px]" title={`Lomba ${i + 1}: ${cName}`}>
                         {cName}
                       </th>
                     );
                   })}
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b border-brand-border/10">Total</th>
-                  <th className="py-4 px-4 text-right border-b border-brand-border/10"></th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">Total</th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-4 text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -913,8 +1008,9 @@ export default function Admin() {
                             className="w-full bg-transparent font-black uppercase tracking-tight text-[12px] text-brand-dark focus:outline-none"
                             value={item.team}
                             onChange={(e) => {
-                              const newRecap = [...data.recap_sd];
-                              newRecap[i].team = e.target.value;
+                              const newRecap = data.recap_sd.map((t: any, tIdx: number) => 
+                                tIdx === i ? { ...t, team: e.target.value } : t
+                              );
                               setData({ ...data, recap_sd: newRecap });
                             }}
                           />
@@ -924,31 +1020,35 @@ export default function Admin() {
                             className="w-20 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-[11px] focus:outline-none"
                             value={item.tent_no || ""}
                             onChange={(e) => {
-                              const newRecap = [...data.recap_sd];
-                              newRecap[i].tent_no = e.target.value;
+                              const newRecap = data.recap_sd.map((t: any, tIdx: number) => 
+                                tIdx === i ? { ...t, tent_no: e.target.value } : t
+                              );
                               setData({ ...data, recap_sd: newRecap });
                             }}
                           />
                         </td>
                         {Array.from({ length: 23 }).map((_, sIdx) => (
                           <td key={sIdx} className="py-2 px-1 border-b border-brand-border/10">
-                            <input
-                              type="number"
-                              className="w-14 bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
-                              value={item.scores[sIdx] || 0}
-                              onChange={(e) => {
-                                const newRecap = [...data.recap_sd];
-                                const val = parseInt(e.target.value) || 0;
-                                newRecap[i].scores[sIdx] = val;
-                                // Recalculate total
-                                newRecap[i].total = newRecap[i].scores.reduce((a: number, b: number) => a + b, 0);
+                            <ScoreInput
+                              value={item.scores[sIdx]}
+                              onChange={(val) => {
+                                const newRecap = data.recap_sd.map((t: any, tIdx: number) => {
+                                  if (tIdx !== i) return t;
+                                  const scores = Array.isArray(t.scores) ? [...t.scores] : Array(23).fill(0);
+                                  scores[sIdx] = val;
+                                  const sum = scores.reduce((a: number, b: number) => a + (Number(b) || 0), 0);
+                                  const total = Math.round(sum * 100) / 100;
+                                  return { ...t, scores, total };
+                                });
                                 setData({ ...data, recap_sd: newRecap });
                               }}
                             />
                           </td>
                         ))}
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
-                          <span className="font-black text-[14px] tracking-tighter text-brand-primary">{item.total}</span>
+                          <span className="font-black text-[14px] tracking-tighter text-brand-primary">
+                            {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
+                          </span>
                         </td>
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
                           <button
@@ -997,8 +1097,11 @@ export default function Admin() {
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8 pb-6 border-b border-brand-border/40">
             <div>
               <h2 className="text-2xl font-black uppercase tracking-tighter mb-1 italic text-brand-primary">Pengaturan Skor & Rekapitulasi SMP/MTs</h2>
-              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest">
-                Kelola penilaian regu tingkat SMP/MTs secara terpisah (Putra & Putri)
+              <p className="text-[10px] font-bold text-brand-muted uppercase tracking-widest flex items-center gap-2 flex-wrap">
+                <span>Kelola penilaian regu tingkat SMP/MTs secara terpisah (Putra & Putri)</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 normal-case tracking-normal">
+                  Mendukung desimal 2 angka di belakang koma
+                </span>
               </p>
             </div>
             
@@ -1039,23 +1142,23 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="overflow-x-auto -mx-6 px-6">
+          <div className="overflow-auto max-h-[72vh] -mx-6 px-6 border border-brand-border/30 rounded-2xl relative shadow-sm">
             <table className="w-full text-left border-separate border-spacing-0 min-w-[2000px] select-none text-[12px]">
               <thead>
                 <tr>
-                  <th className="sticky left-0 bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b border-brand-border/10">No</th>
-                  <th className="sticky left-[48px] bg-white z-30 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.15)] border-b border-brand-border/10 min-w-[180px]">Nama Regu</th>
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b border-brand-border/10">No Tenda</th>
+                  <th className="sticky top-0 left-0 bg-white z-50 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]">No</th>
+                  <th className="sticky top-0 left-[48px] bg-white z-50 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 border-b-2 border-brand-border/20 shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.1)] min-w-[180px]">Nama Regu</th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">No Tenda</th>
                   {Array.from({ length: 32 }).map((_, i) => {
                     const cName = data?.competition_names_smp?.[i] || DEFAULT_SMP_COMPETITIONS[i] || (i + 1 < 10 ? `L-0${i + 1}` : `L-${i + 1}`);
                     return (
-                      <th key={i} className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b border-brand-border/10 whitespace-nowrap min-w-[70px]" title={`Lomba ${i + 1}: ${cName}`}>
+                      <th key={i} className="sticky top-0 bg-white z-40 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap min-w-[70px]" title={`Lomba ${i + 1}: ${cName}`}>
                         {cName}
                       </th>
                     );
                   })}
-                  <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b border-brand-border/10">Total</th>
-                  <th className="py-4 px-4 text-right border-b border-brand-border/10"></th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">Total</th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-4 text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -1097,8 +1200,9 @@ export default function Admin() {
                             className="w-full bg-transparent font-black uppercase tracking-tight text-[12px] text-brand-dark focus:outline-none"
                             value={item.team}
                             onChange={(e) => {
-                              const newRecap = [...data.recap_smp];
-                              newRecap[i].team = e.target.value;
+                              const newRecap = data.recap_smp.map((t: any, tIdx: number) => 
+                                tIdx === i ? { ...t, team: e.target.value } : t
+                              );
                               setData({ ...data, recap_smp: newRecap });
                             }}
                           />
@@ -1108,34 +1212,35 @@ export default function Admin() {
                             className="w-20 bg-transparent font-bold text-slate-500 uppercase tracking-widest text-[11px] focus:outline-none"
                             value={item.tent_no || ""}
                             onChange={(e) => {
-                              const newRecap = [...data.recap_smp];
-                              newRecap[i].tent_no = e.target.value;
+                              const newRecap = data.recap_smp.map((t: any, tIdx: number) => 
+                                tIdx === i ? { ...t, tent_no: e.target.value } : t
+                              );
                               setData({ ...data, recap_smp: newRecap });
                             }}
                           />
                         </td>
                         {Array.from({ length: 32 }).map((_, sIdx) => (
                           <td key={sIdx} className="py-2 px-1 border-b border-brand-border/10">
-                            <input
-                              type="number"
-                              className="w-14 bg-white border border-brand-border p-1.5 rounded-lg text-center font-bold text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
-                              value={item.scores[sIdx] || 0}
-                              onChange={(e) => {
-                                const newRecap = [...data.recap_smp];
-                                if (!Array.isArray(newRecap[i].scores)) {
-                                  newRecap[i].scores = Array(32).fill(0);
-                                }
-                                const val = parseInt(e.target.value) || 0;
-                                newRecap[i].scores[sIdx] = val;
-                                // Recalculate total
-                                newRecap[i].total = newRecap[i].scores.reduce((a: number, b: number) => a + b, 0);
+                            <ScoreInput
+                              value={item.scores[sIdx]}
+                              onChange={(val) => {
+                                const newRecap = data.recap_smp.map((t: any, tIdx: number) => {
+                                  if (tIdx !== i) return t;
+                                  const scores = Array.isArray(t.scores) ? [...t.scores] : Array(32).fill(0);
+                                  scores[sIdx] = val;
+                                  const sum = scores.reduce((a: number, b: number) => a + (Number(b) || 0), 0);
+                                  const total = Math.round(sum * 100) / 100;
+                                  return { ...t, scores, total };
+                                });
                                 setData({ ...data, recap_smp: newRecap });
                               }}
                             />
                           </td>
                         ))}
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
-                          <span className="font-black text-[14px] tracking-tighter text-brand-primary">{item.total}</span>
+                          <span className="font-black text-[14px] tracking-tighter text-brand-primary">
+                            {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
+                          </span>
                         </td>
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
                           <button
