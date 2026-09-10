@@ -441,6 +441,14 @@ export default function Admin() {
     });
   };
 
+  const calculateGroupRank = (targetItem: any, groupList: any[]): number => {
+    const targetTotal = Number(targetItem.total) || 0;
+    const higherCount = groupList.filter(
+      (other: any) => (Number(other.total) || 0) > targetTotal
+    ).length;
+    return higherCount + 1;
+  };
+
   const setSanitizedData = (newData: any, referenceData: any = null) => {
     const ref = referenceData || localData || rawFallbackData;
     if (!newData) {
@@ -972,6 +980,7 @@ export default function Admin() {
                     );
                   })}
                   <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">Total</th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-3 text-[10px] font-black uppercase tracking-widest text-brand-primary text-center border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">Peringkat</th>
                   <th className="sticky top-0 bg-white z-40 py-4 px-4 text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]"></th>
                 </tr>
               </thead>
@@ -1049,6 +1058,24 @@ export default function Admin() {
                           <span className="font-black text-[14px] tracking-tighter text-brand-primary">
                             {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
                           </span>
+                        </td>
+                        <td className="py-4 px-3 text-center border-b border-brand-border/10 whitespace-nowrap">
+                          {(() => {
+                            const rank = calculateGroupRank(item, displayedTeams);
+                            return (
+                              <span className={`inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full font-black text-[11px] ${
+                                rank === 1 && Number(item.total) > 0
+                                  ? "bg-amber-400 text-amber-950 shadow-sm ring-1 ring-amber-300 font-black"
+                                  : rank === 2 && Number(item.total) > 0
+                                  ? "bg-slate-200 text-slate-800 ring-1 ring-slate-300 font-black"
+                                  : rank === 3 && Number(item.total) > 0
+                                  ? "bg-amber-700/15 text-amber-950 ring-1 ring-amber-700/30 font-black"
+                                  : "bg-slate-100 text-slate-700 font-bold"
+                              }`}>
+                                {rank}
+                              </span>
+                            );
+                          })()}
                         </td>
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
                           <button
@@ -1158,6 +1185,7 @@ export default function Admin() {
                     );
                   })}
                   <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-primary text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">Total</th>
+                  <th className="sticky top-0 bg-white z-40 py-4 px-3 text-[10px] font-black uppercase tracking-widest text-brand-primary text-center border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">Peringkat</th>
                   <th className="sticky top-0 bg-white z-40 py-4 px-4 text-right border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]"></th>
                 </tr>
               </thead>
@@ -1241,6 +1269,24 @@ export default function Admin() {
                           <span className="font-black text-[14px] tracking-tighter text-brand-primary">
                             {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
                           </span>
+                        </td>
+                        <td className="py-4 px-3 text-center border-b border-brand-border/10 whitespace-nowrap">
+                          {(() => {
+                            const rank = calculateGroupRank(item, displayedTeams);
+                            return (
+                              <span className={`inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full font-black text-[11px] ${
+                                rank === 1 && Number(item.total) > 0
+                                  ? "bg-amber-400 text-amber-950 shadow-sm ring-1 ring-amber-300 font-black"
+                                  : rank === 2 && Number(item.total) > 0
+                                  ? "bg-slate-200 text-slate-800 ring-1 ring-slate-300 font-black"
+                                  : rank === 3 && Number(item.total) > 0
+                                  ? "bg-amber-700/15 text-amber-950 ring-1 ring-amber-700/30 font-black"
+                                  : "bg-slate-100 text-slate-700 font-bold"
+                              }`}>
+                                {rank}
+                              </span>
+                            );
+                          })()}
                         </td>
                         <td className="py-4 px-4 text-right border-b border-brand-border/10">
                           <button

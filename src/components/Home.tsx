@@ -595,6 +595,14 @@ export default function Home() {
     .sort((a, b) => getTentNum(a.tent_no) - getTentNum(b.tent_no));
   const tableFontSize = Number(settings?.table_font_size || "12");
 
+  const calculateGroupRank = (targetItem: any, groupList: any[]): number => {
+    const targetTotal = Number(targetItem.total) || 0;
+    const higherCount = groupList.filter(
+      (other: any) => (Number(other.total) || 0) > targetTotal
+    ).length;
+    return higherCount + 1;
+  };
+
   const COMPETITIONS = [
     { id: 1, name: "Pionering", icon: <Tent className="w-6 h-6" />, desc: "Ketangkasan membuat bangunan darurat menggunakan tali dan tongkat." },
     { id: 2, name: "Semaphore & Morse", icon: <Compass className="w-6 h-6" />, desc: "Adu cepat dan tepat dalam berkirim pesan rahasia jarak jauh." },
@@ -1057,6 +1065,7 @@ export default function Home() {
                       <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
                     <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Peringkat</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1078,6 +1087,24 @@ export default function Home() {
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
                         {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
+                      </td>
+                      <td className="px-6 py-3 text-center border-b border-brand-border/60 whitespace-nowrap">
+                        {(() => {
+                          const rank = calculateGroupRank(item, recapSdPutra);
+                          return (
+                            <span className={`inline-flex items-center justify-center min-w-[34px] h-8 px-2.5 rounded-full font-black text-xs ${
+                              rank === 1 && Number(item.total) > 0
+                                ? "bg-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-300/80 font-black"
+                                : rank === 2 && Number(item.total) > 0
+                                ? "bg-slate-200 text-slate-800 ring-1 ring-slate-300 font-black"
+                                : rank === 3 && Number(item.total) > 0
+                                ? "bg-amber-700/15 text-amber-950 ring-1 ring-amber-700/30 font-black"
+                                : "bg-slate-100 text-slate-700 font-bold"
+                            }`}>
+                              {rank}
+                            </span>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))}
@@ -1107,6 +1134,7 @@ export default function Home() {
                       <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
                     <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Peringkat</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1128,6 +1156,24 @@ export default function Home() {
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
                         {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
+                      </td>
+                      <td className="px-6 py-3 text-center border-b border-brand-border/60 whitespace-nowrap">
+                        {(() => {
+                          const rank = calculateGroupRank(item, recapSdPutri);
+                          return (
+                            <span className={`inline-flex items-center justify-center min-w-[34px] h-8 px-2.5 rounded-full font-black text-xs ${
+                              rank === 1 && Number(item.total) > 0
+                                ? "bg-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-300/80 font-black"
+                                : rank === 2 && Number(item.total) > 0
+                                ? "bg-slate-200 text-slate-800 ring-1 ring-slate-300 font-black"
+                                : rank === 3 && Number(item.total) > 0
+                                ? "bg-amber-700/15 text-amber-950 ring-1 ring-amber-700/30 font-black"
+                                : "bg-slate-100 text-slate-700 font-bold"
+                            }`}>
+                              {rank}
+                            </span>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))}
@@ -1167,6 +1213,7 @@ export default function Home() {
                       <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
                     <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Peringkat</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1188,6 +1235,24 @@ export default function Home() {
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
                         {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
+                      </td>
+                      <td className="px-6 py-3 text-center border-b border-brand-border/60 whitespace-nowrap">
+                        {(() => {
+                          const rank = calculateGroupRank(item, recapSmpPutra);
+                          return (
+                            <span className={`inline-flex items-center justify-center min-w-[34px] h-8 px-2.5 rounded-full font-black text-xs ${
+                              rank === 1 && Number(item.total) > 0
+                                ? "bg-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-300/80 font-black"
+                                : rank === 2 && Number(item.total) > 0
+                                ? "bg-slate-200 text-slate-800 ring-1 ring-slate-300 font-black"
+                                : rank === 3 && Number(item.total) > 0
+                                ? "bg-amber-700/15 text-amber-950 ring-1 ring-amber-700/30 font-black"
+                                : "bg-slate-100 text-slate-700 font-bold"
+                            }`}>
+                              {rank}
+                            </span>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))}
@@ -1217,6 +1282,7 @@ export default function Home() {
                       <th key={i} className="sticky top-0 bg-slate-50 z-40 px-3 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]" title={`Lomba ${i + 1}: ${name}`}>{name}</th>
                     ))}
                     <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-right whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Total Poin</th>
+                    <th className="sticky top-0 bg-slate-50 z-40 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap border-b border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.03)]">Peringkat</th>
                   </tr>
                 </thead>
                 <tbody className="text-brand-dark">
@@ -1238,6 +1304,24 @@ export default function Home() {
                       ))}
                       <td className="px-6 py-3 text-right font-black text-lg tracking-tighter text-brand-primary border-b border-brand-border/60">
                         {Number.isInteger(Number(item.total)) ? Number(item.total) : Number(Number(item.total).toFixed(2))}
+                      </td>
+                      <td className="px-6 py-3 text-center border-b border-brand-border/60 whitespace-nowrap">
+                        {(() => {
+                          const rank = calculateGroupRank(item, recapSmpPutri);
+                          return (
+                            <span className={`inline-flex items-center justify-center min-w-[34px] h-8 px-2.5 rounded-full font-black text-xs ${
+                              rank === 1 && Number(item.total) > 0
+                                ? "bg-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-300/80 font-black"
+                                : rank === 2 && Number(item.total) > 0
+                                ? "bg-slate-200 text-slate-800 ring-1 ring-slate-300 font-black"
+                                : rank === 3 && Number(item.total) > 0
+                                ? "bg-amber-700/15 text-amber-950 ring-1 ring-amber-700/30 font-black"
+                                : "bg-slate-100 text-slate-700 font-bold"
+                            }`}>
+                              {rank}
+                            </span>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))}
