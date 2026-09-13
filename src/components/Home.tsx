@@ -279,7 +279,16 @@ export default function Home() {
   const formatTentNo = (tent: string) => {
     if (!tent || typeof tent !== "string") return tent;
     if (tent.toUpperCase().startsWith("PI-")) {
-      return "B." + tent.slice(3);
+      return "B " + tent.slice(3);
+    }
+    if (tent.toUpperCase().startsWith("B.")) {
+      return "B " + tent.slice(2);
+    }
+    if (tent.toUpperCase().startsWith("PA-")) {
+      return "A " + tent.slice(3);
+    }
+    if (tent.toUpperCase().startsWith("A.")) {
+      return "A " + tent.slice(2);
     }
     return tent;
   };
@@ -287,37 +296,31 @@ export default function Home() {
   const formatTentNoSmp = (tent: string) => {
     if (!tent || typeof tent !== "string") return tent;
     const clean = tent.trim().toUpperCase();
-    if (clean === "PA-09" || clean === "PA-9" || clean === "PA-01" || clean === "PA-1" || clean === "A.01" || clean === "A.1" || clean === "A.09" || clean === "A.9") {
-      return "C.25";
+    if (clean.startsWith("A ") || clean.startsWith("A.") || clean.startsWith("C.") || clean.startsWith("C-") || clean.startsWith("C ") || clean.startsWith("PA")) {
+      const m = clean.match(/\d+/);
+      if (m) {
+        const num = parseInt(m[0], 10);
+        if (num >= 25 && num <= 32) {
+          return `A ${num}`;
+        }
+        if (num >= 1 && num <= 8) {
+          return `A ${24 + num}`;
+        }
+      }
+      return "A 25";
     }
-    // SMP Putri: B-01 / B.01 / PI-01 -> D.25, B-02 / B.02 / PI-02 -> D.26, ..., B-08 / B.08 / PI-08 -> D.32
-    if (clean.startsWith("PI-") || clean.startsWith("B.") || clean.startsWith("B-") || clean.startsWith("D.") || clean.startsWith("D-")) {
+    if (clean.startsWith("PI-") || clean.startsWith("B.") || clean.startsWith("B-") || clean.startsWith("B ") || clean.startsWith("D.") || clean.startsWith("D-") || clean.startsWith("D ")) {
       const m = clean.match(/\d+/);
       if (m) {
         const num = parseInt(m[0], 10);
         if (num >= 1 && num <= 8) {
-          return `D.${24 + num}`;
+          return `B 0${num}`;
         }
         if (num >= 25 && num <= 32) {
-          return `D.${num}`;
+          return `B 0${num - 24}`;
         }
       }
-      return "D.25";
-    }
-    if (clean.startsWith("PA-") || clean.startsWith("A.") || clean.startsWith("C.") || clean.startsWith("C-")) {
-      const m = clean.match(/\d+/);
-      if (m) {
-        const num = parseInt(m[0], 10);
-        if (num === 9 || num === 1) {
-          return "C.25";
-        }
-        if (num >= 2 && num <= 8) {
-          return `C.${24 + num}`;
-        }
-        if (num >= 25 && num <= 32) {
-          return `C.${num}`;
-        }
-      }
+      return "B 01";
     }
     return tent;
   };
@@ -326,78 +329,90 @@ export default function Home() {
   const ensure64TeamsForSd = (recapList: any[], numScores = 23): any[] => {
     const list = recapList || [];
     
-    // Default 24 Putra (PA-01 s/d PA-24)
+    // Default 24 Putra (A 01 s/d A 24)
     const defaultPutra = [
-      { team: "Regu Garuda (Putra)", tent_no: "PA-01" },
-      { team: "Regu Elang (Putra)", tent_no: "PA-02" },
-      { team: "Regu Rajawali (Putra)", tent_no: "PA-03" },
-      { team: "Regu Harimau (Putra)", tent_no: "PA-04" },
-      { team: "Regu Singa (Putra)", tent_no: "PA-05" },
-      { team: "Regu Beruang (Putra)", tent_no: "PA-06" },
-      { team: "Regu Banteng (Putra)", tent_no: "PA-07" },
-      { team: "Regu Kobra (Putra)", tent_no: "PA-08" },
-      { team: "Regu Scorpion (Putra)", tent_no: "PA-09" },
-      { team: "Regu Kancil (Putra)", tent_no: "PA-10" },
-      { team: "Regu Kelelawar (Putra)", tent_no: "PA-11" },
-      { team: "Regu Serigala (Putra)", tent_no: "PA-12" },
-      { team: "Regu Hiu (Putra)", tent_no: "PA-13" },
-      { team: "Regu Lumba (Putra)", tent_no: "PA-14" },
-      { team: "Regu Rusa (Putra)", tent_no: "PA-15" },
-      { team: "Regu Singa Emas (Putra)", tent_no: "PA-16" },
-      { team: "Regu Cheetah (Putra)", tent_no: "PA-17" },
-      { team: "Regu Jaguar (Putra)", tent_no: "PA-18" },
-      { team: "Regu Panther (Putra)", tent_no: "PA-19" },
-      { team: "Regu Falcon (Putra)", tent_no: "PA-20" },
-      { team: "Regu Condor (Putra)", tent_no: "PA-21" },
-      { team: "Regu Cobra (Putra)", tent_no: "PA-22" },
-      { team: "Regu Scorpion Merah (Putra)", tent_no: "PA-23" },
-      { team: "Regu Macan (Putra)", tent_no: "PA-24" }
+      { team: "GARUDA", tent_no: "A 01" },
+      { team: "SERIGALA", tent_no: "A 02" },
+      { team: "GARUDA", tent_no: "A 03" },
+      { team: "Kancil", tent_no: "A 04" },
+      { team: "Banteng", tent_no: "A 05" },
+      { team: "(Kosong)", tent_no: "A 06" },
+      { team: "Banteng", tent_no: "A 07" },
+      { team: "KOBRA", tent_no: "A 08" },
+      { team: "BANTENG", tent_no: "A 09" },
+      { team: "Cendrawasih", tent_no: "A 10" },
+      { team: "SERIGALA", tent_no: "A 11" },
+      { team: "BANTENG", tent_no: "A 12" },
+      { team: "Kancil", tent_no: "A 13" },
+      { team: "RUSA", tent_no: "A 14" },
+      { team: "Rajawali", tent_no: "A 15" },
+      { team: "KANCIL", tent_no: "A 16" },
+      { team: "(Kosong)", tent_no: "A 17" },
+      { team: "(Kosong)", tent_no: "A 18" },
+      { team: "ELANG", tent_no: "A 19" },
+      { team: "Kancil", tent_no: "A 20" },
+      { team: "BANTENG", tent_no: "A 21" },
+      { team: "TUPAI", tent_no: "A 22" },
+      { team: "RAJAWALI", tent_no: "A 23" },
+      { team: "Banteng", tent_no: "A 24" }
     ];
 
-    // Default 24 Putri (B.01 s/d B.24)
+    // Default 24 Putri (B 01 s/d B 24)
     const defaultPutri = [
-      { team: "Regu Melati (Putri)", tent_no: "B.01" },
-      { team: "Regu Mawar (Putri)", tent_no: "B.02" },
-      { team: "Regu Dahlia (Putri)", tent_no: "B.03" },
-      { team: "Regu Anggrek (Putri)", tent_no: "B.04" },
-      { team: "Regu Tulip (Putri)", tent_no: "B.05" },
-      { team: "Regu Sakura (Putri)", tent_no: "B.06" },
-      { team: "Regu Teratai (Putri)", tent_no: "B.07" },
-      { team: "Regu Lavender (Putri)", tent_no: "B.08" },
-      { team: "Regu Lily (Putri)", tent_no: "B.09" },
-      { team: "Regu Aster (Putri)", tent_no: "B.10" },
-      { team: "Regu Kenanga (Putri)", tent_no: "B.11" },
-      { team: "Regu Kamboja (Putri)", tent_no: "B.12" },
-      { team: "Regu Bougenville (Putri)", tent_no: "B.13" },
-      { team: "Regu Flamboyan (Putri)", tent_no: "B.14" },
-      { team: "Regu Edelweis (Putri)", tent_no: "B.15" },
-      { team: "Regu Matahari (Putri)", tent_no: "B.16" },
-      { team: "Regu Jasmine (Putri)", tent_no: "B.17" },
-      { team: "Regu Orchid (Putri)", tent_no: "B.18" },
-      { team: "Regu Camelia (Putri)", tent_no: "B.19" },
-      { team: "Regu Magnolia (Putri)", tent_no: "B.20" },
-      { team: "Regu Dahlia Putih (Putri)", tent_no: "B.21" },
-      { team: "Regu Sakura Merah (Putri)", tent_no: "B.22" },
-      { team: "Regu Lily Putih (Putri)", tent_no: "B.23" },
-      { team: "Regu Tulip Merah (Putri)", tent_no: "B.24" }
+      { team: "MATAHARI", tent_no: "B 01" },
+      { team: "ANGGREK", tent_no: "B 02" },
+      { team: "SAKURA", tent_no: "B 03" },
+      { team: "Cempaka", tent_no: "B 04" },
+      { team: "Tulip", tent_no: "B 05" },
+      { team: "(Kosong)", tent_no: "B 06" },
+      { team: "Melati", tent_no: "B 07" },
+      { team: "MATAHARI", tent_no: "B 08" },
+      { team: "Melati", tent_no: "B 09" },
+      { team: "Wijayakusuma", tent_no: "B 10" },
+      { team: "EDELWEIS", tent_no: "B 11" },
+      { team: "FLAMBOYAN", tent_no: "B 12" },
+      { team: "Matahari", tent_no: "B 13" },
+      { team: "EDELWEIS", tent_no: "B 14" },
+      { team: "Melati", tent_no: "B 15" },
+      { team: "TULIP", tent_no: "B 16" },
+      { team: "(Kosong)", tent_no: "B 17" },
+      { team: "MAWAR", tent_no: "B 18" },
+      { team: "DAHLIA", tent_no: "B 19" },
+      { team: "(Kosong)", tent_no: "B 20" },
+      { team: "MELATI", tent_no: "B 21" },
+      { team: "MAWAR", tent_no: "B 22" },
+      { team: "MELATI", tent_no: "B 23" },
+      { team: "MAWAR", tent_no: "B 24" }
     ];
 
     const incomingPutra = list.filter((item: any) => 
-      item && item.team && (item.team.toLowerCase().includes("putra") || 
-      (item.tent_no && (item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A."))))
+      item && (
+        (item.team && item.team.toLowerCase().includes("putra")) || 
+        (item.tent_no && (
+          item.tent_no.toUpperCase().startsWith("PA") || 
+          item.tent_no.toUpperCase().startsWith("A") || 
+          item.tent_no.toLowerCase().startsWith("a")
+        ))
+      )
     );
 
     const incomingPutri = list.filter((item: any) => 
-      item && item.team && (item.team.toLowerCase().includes("putri") || 
-      (item.tent_no && (item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B."))))
+      item && (
+        (item.team && item.team.toLowerCase().includes("putri")) || 
+        (item.tent_no && (
+          item.tent_no.toUpperCase().startsWith("PI") || 
+          item.tent_no.toUpperCase().startsWith("B") || 
+          item.tent_no.toLowerCase().startsWith("b")
+        ))
+      )
     );
 
     const incomingOthers = list.filter((item: any) => 
-      item && item.team && 
-      !item.team.toLowerCase().includes("putra") && 
-      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A."))) &&
-      !item.team.toLowerCase().includes("putri") && 
-      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B.")))
+      item && 
+      !(item.team && item.team.toLowerCase().includes("putra")) && 
+      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A") || item.tent_no.toLowerCase().startsWith("a"))) &&
+      !(item.team && item.team.toLowerCase().includes("putri")) && 
+      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B") || item.tent_no.toLowerCase().startsWith("b")))
     );
 
     const putraResult = [...incomingPutra];
@@ -461,43 +476,43 @@ export default function Home() {
   const ensure32Teams = (recapList: any[], numScores = 32): any[] => {
     const list = recapList || [];
     const defaultPutra = [
-      { team: "Regu Garuda (Putra)", tent_no: "C.25" },
-      { team: "Regu Elang (Putra)", tent_no: "C.26" },
-      { team: "Regu Rajawali (Putra)", tent_no: "C.27" },
-      { team: "Regu Harimau (Putra)", tent_no: "C.28" },
-      { team: "Regu Singa (Putra)", tent_no: "C.29" },
-      { team: "Regu Beruang (Putra)", tent_no: "C.30" },
-      { team: "Regu Banteng (Putra)", tent_no: "C.31" },
-      { team: "Regu Kobra (Putra)", tent_no: "C.32" }
+      { team: "HARIMAU", tent_no: "A 25" },
+      { team: "Rajawali", tent_no: "A 26" },
+      { team: "ELANG", tent_no: "A 27" },
+      { team: "Harimau", tent_no: "A 28" },
+      { team: "RAJAWALI", tent_no: "A 29" },
+      { team: "GARUDA", tent_no: "A 30" },
+      { team: "(Kosong)", tent_no: "A 31" },
+      { team: "SINGA", tent_no: "A 32" }
     ];
 
     const defaultPutri = [
-      { team: "Regu Melati (Putri)", tent_no: "D.25" },
-      { team: "Regu Mawar (Putri)", tent_no: "D.26" },
-      { team: "Regu Dahlia (Putri)", tent_no: "D.27" },
-      { team: "Regu Anggrek (Putri)", tent_no: "D.28" },
-      { team: "Regu Tulip (Putri)", tent_no: "D.29" },
-      { team: "Regu Sakura (Putri)", tent_no: "D.30" },
-      { team: "Regu Teratai (Putri)", tent_no: "D.31" },
-      { team: "Regu Lavender (Putri)", tent_no: "D.32" }
+      { team: "MATAHARI", tent_no: "B 01" },
+      { team: "Matahari", tent_no: "B 02" },
+      { team: "TERATAI", tent_no: "B 03" },
+      { team: "Wijaya Kusuma", tent_no: "B 04" },
+      { team: "MELATI", tent_no: "B 05" },
+      { team: "TULIP", tent_no: "B 06" },
+      { team: "(Kosong)", tent_no: "B 07" },
+      { team: "MATAHARI", tent_no: "B 08" }
     ];
 
     const incomingPutra = list.filter((item: any) => 
       item && item.team && (item.team.toLowerCase().includes("putra") || 
-      (item.tent_no && (item.tent_no.toUpperCase().startsWith("C.") || item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A."))))
+      (item.tent_no && (item.tent_no.toUpperCase().startsWith("C.") || item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A"))))
     );
 
     const incomingPutri = list.filter((item: any) => 
       item && item.team && (item.team.toLowerCase().includes("putri") || 
-      (item.tent_no && (item.tent_no.toUpperCase().startsWith("D.") || item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B."))))
+      (item.tent_no && (item.tent_no.toUpperCase().startsWith("D.") || item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B"))))
     );
 
     const incomingOthers = list.filter((item: any) => 
       item && item.team && 
       !item.team.toLowerCase().includes("putra") && 
-      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("C.") || item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A."))) &&
+      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("C.") || item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A"))) &&
       !item.team.toLowerCase().includes("putri") && 
-      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("D.") || item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B.")))
+      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("D.") || item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B")))
     );
 
     const putraResult = [...incomingPutra];
@@ -505,7 +520,7 @@ export default function Home() {
       const idx = putraResult.length;
       const nextDefault = defaultPutra.find(d => !putraResult.some(p => formatTentNoSmp(p.tent_no) === d.tent_no)) 
         || defaultPutra[idx] 
-        || { team: `Regu Putra ${idx + 1}`, tent_no: `C.${25 + idx}` };
+        || { team: `Putra ${idx + 1}`, tent_no: `A ${25 + idx}` };
       
       putraResult.push({
         rank: idx + 1,
@@ -521,7 +536,7 @@ export default function Home() {
       const idx = putriResult.length;
       const nextDefault = defaultPutri.find(d => !putriResult.some(p => formatTentNoSmp(p.tent_no) === d.tent_no)) 
         || defaultPutri[idx] 
-        || { team: `Regu Putri ${idx + 1}`, tent_no: `D.${25 + idx}` };
+        || { team: `Putri ${idx + 1}`, tent_no: `B 0${idx + 1}` };
 
       putriResult.push({
         rank: idx + 1,
@@ -563,7 +578,8 @@ export default function Home() {
     .filter((item: any) => 
       item.team.toLowerCase().includes("putra") || 
       item.tent_no.toUpperCase().startsWith("PA") ||
-      item.tent_no.toUpperCase().startsWith("A.")
+      item.tent_no.toUpperCase().startsWith("A") ||
+      item.tent_no.toLowerCase().startsWith("a")
     )
     .sort((a, b) => getTentNum(a.tent_no) - getTentNum(b.tent_no));
 
@@ -571,7 +587,8 @@ export default function Home() {
     .filter((item: any) => 
       item.team.toLowerCase().includes("putri") || 
       item.tent_no.toUpperCase().startsWith("PI") ||
-      item.tent_no.toUpperCase().startsWith("B.")
+      item.tent_no.toUpperCase().startsWith("B") ||
+      item.tent_no.toLowerCase().startsWith("b")
     )
     .sort((a, b) => getTentNum(a.tent_no) - getTentNum(b.tent_no));
 
@@ -581,7 +598,7 @@ export default function Home() {
       item.team.toLowerCase().includes("putra") || 
       item.tent_no.toUpperCase().startsWith("C.") ||
       item.tent_no.toUpperCase().startsWith("PA") ||
-      item.tent_no.toUpperCase().startsWith("A.")
+      item.tent_no.toUpperCase().startsWith("A")
     )
     .sort((a, b) => getTentNum(a.tent_no) - getTentNum(b.tent_no));
 
@@ -590,7 +607,7 @@ export default function Home() {
       item.team.toLowerCase().includes("putri") || 
       item.tent_no.toUpperCase().startsWith("D.") ||
       item.tent_no.toUpperCase().startsWith("PI") ||
-      item.tent_no.toUpperCase().startsWith("B.")
+      item.tent_no.toUpperCase().startsWith("B")
     )
     .sort((a, b) => getTentNum(a.tent_no) - getTentNum(b.tent_no));
   const tableFontSize = Number(settings?.table_font_size || "12");

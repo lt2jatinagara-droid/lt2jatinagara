@@ -928,10 +928,10 @@
   ],
   "recap_sd": [
     {
-      "tent_no": "a 01",
+      "tent_no": "A 01",
       "total": 261,
       "rank": 1,
-      "team": "Regu Elang (Putra)",
+      "team": "GARUDA",
       "scores": [
         76,
         90,
@@ -986,8 +986,8 @@
         80
       ],
       "rank": 2,
-      "team": "Regu Rajawali (Putra)",
-      "tent_no": "a 02"
+      "team": "SERIGALA",
+      "tent_no": "A 02"
     },
     {
       "scores": [
@@ -1015,15 +1015,15 @@
         0,
         0
       ],
-      "team": "Regu Harimau (Putra)",
+      "team": "GARUDA",
       "rank": 3,
-      "tent_no": "a 03",
+      "tent_no": "A 03",
       "total": 0
     },
     {
       "rank": 4,
-      "team": "Regu Singa (Putra)",
-      "tent_no": "a 04",
+      "team": "Kancil",
+      "tent_no": "A 04",
       "total": 400,
       "scores": [
         100,
@@ -1078,13 +1078,13 @@
         0,
         0
       ],
-      "tent_no": "a 05",
+      "tent_no": "A 05",
       "rank": 5,
-      "team": "Regu Beruang (Putra)"
+      "team": "Banteng"
     },
     {
       "rank": 6,
-      "team": "Regu Banteng (Putra)",
+      "team": "(Kosong)",
       "scores": [
         0,
         0,
@@ -1111,13 +1111,13 @@
         0
       ],
       "total": 0,
-      "tent_no": "a 06"
+      "tent_no": "A 06"
     },
     {
       "rank": 7,
-      "team": "Regu Kobra (Putra)",
+      "team": "Banteng",
       "total": 0,
-      "tent_no": "a 07",
+      "tent_no": "A 07",
       "scores": [
         0,
         0,
@@ -1145,7 +1145,7 @@
       ]
     },
     {
-      "team": "Regu Scorpion (Putra)",
+      "team": "KOBRA",
       "rank": 8,
       "total": 0,
       "scores": [
@@ -1173,12 +1173,12 @@
         0,
         0
       ],
-      "tent_no": "a 08"
+      "tent_no": "A 08"
     },
     {
       "total": 0,
-      "tent_no": "a 09",
-      "team": "Regu Kancil (Putra)",
+      "tent_no": "A 09",
+      "team": "BANTENG",
       "rank": 9,
       "scores": [
         0,
@@ -1233,9 +1233,9 @@
         0,
         0
       ],
-      "tent_no": "a 10",
+      "tent_no": "A 10",
       "rank": 10,
-      "team": "Regu Kelelawar (Putra)"
+      "team": "Cendrawasih"
     },
     {
       "scores": [
@@ -1263,10 +1263,10 @@
         0,
         0
       ],
-      "team": "Regu Serigala (Putra)",
+      "team": "SERIGALA",
       "rank": 11,
       "total": 0,
-      "tent_no": "a 11"
+      "tent_no": "A 11"
     },
     {
       "scores": [
@@ -1294,8 +1294,8 @@
         0,
         0
       ],
-      "tent_no": "a 12",
-      "team": "Regu Hiu (Putra)",
+      "tent_no": "A 12",
+      "team": "BANTENG",
       "rank": 12,
       "total": 0
     },
@@ -1325,9 +1325,9 @@
         0,
         0
       ],
-      "team": "Regu Lumba (Putra)",
+      "team": "Kancil",
       "rank": 13,
-      "tent_no": "a 13",
+      "tent_no": "A 13",
       "total": 0
     },
     {
@@ -1356,13 +1356,13 @@
         0,
         0
       ],
-      "team": "Regu Rusa (Putra)",
-      "tent_no": "a 14",
+      "team": "RUSA",
+      "tent_no": "A 14",
       "rank": 14,
       "total": 0
     },
     {
-      "team": "Regu Singa Emas (Putra)",
+      "team": "Rajawali",
       "scores": [
         0,
         0,
@@ -1390,10 +1390,10 @@
       ],
       "rank": 15,
       "total": 0,
-      "tent_no": "a 15"
+      "tent_no": "A 15"
     },
     {
-      "tent_no": "a 16",
+      "tent_no": "A 16",
       "total": 0,
       "scores": [
         0,
@@ -1420,13 +1420,13 @@
         0,
         0
       ],
-      "team": "Regu Garuda (Putra)",
+      "team": "KANCIL",
       "rank": 16
     },
     {
       "rank": 17,
-      "team": "Regu Cheetah (Putra)",
-      "tent_no": "a 17",
+      "team": "(Kosong)",
+      "tent_no": "A 17",
       "total": 0,
       "scores": [
         0,
@@ -1455,7 +1455,7 @@
       ]
     },
     {
-      "team": "Regu Jaguar (Putra)",
+      "team": "(Kosong)",
       "rank": 18,
       "scores": [
         0,
@@ -1482,7 +1482,7 @@
         0,
         0
       ],
-      "tent_no": "a 18",
+      "tent_no": "A 18",
       "total": 0
     },
     {
@@ -1511,16 +1511,16 @@
         0,
         0
       ],
-      "team": "Regu Panther (Putra)",
+      "team": "ELANG",
       "rank": 19,
-      "tent_no": "a 19",
+      "tent_no": "A 19",
       "total": 0
     },
     {
       "total": 0,
-      "tent_no": "a 20",
+      "tent_no": "A 20",
       "rank": 20,
-      "team": "Regu Falcon (Putra)",
+      "team": "Kancil",
       "scores": [
         0,
         0,
@@ -1548,9 +1548,9 @@
       ]
     },
     {
-      "tent_no": "a 21",
+      "tent_no": "A 21",
       "total": 0,
-      "team": "Regu Condor (Putra)",
+      "team": "BANTENG",
       "rank": 21,
       "scores": [
         0,
@@ -1580,8 +1580,8 @@
     },
     {
       "rank": 22,
-      "team": "Regu Cobra (Putra)",
-      "tent_no": "a 22",
+      "team": "TUPAI",
+      "tent_no": "A 22",
       "scores": [
         0,
         0,
@@ -1636,12 +1636,12 @@
         0
       ],
       "total": 0,
-      "tent_no": "a 23",
+      "tent_no": "A 23",
       "rank": 23,
-      "team": "Regu Scorpion Merah (Putra)"
+      "team": "RAJAWALI"
     },
     {
-      "tent_no": "a 24",
+      "tent_no": "A 24",
       "scores": [
         0,
         0,
@@ -1667,7 +1667,7 @@
         0,
         0
       ],
-      "team": "Regu Macan (Putra)",
+      "team": "Banteng",
       "rank": 24,
       "total": 0
     },
@@ -1698,15 +1698,15 @@
         0,
         0
       ],
-      "tent_no": "B.01",
+      "tent_no": "B 01",
       "rank": 25,
-      "team": "Regu Melati (Putri)"
+      "team": "MATAHARI"
     },
     {
       "total": 270,
-      "tent_no": "B.02",
+      "tent_no": "B 02",
       "rank": 26,
-      "team": "Regu Mawar (Putri)",
+      "team": "ANGGREK",
       "scores": [
         80,
         90,
@@ -1735,7 +1735,7 @@
     },
     {
       "rank": 27,
-      "team": "Regu Dahlia (Putri)",
+      "team": "SAKURA",
       "scores": [
         0,
         0,
@@ -1762,11 +1762,11 @@
         0
       ],
       "total": 0,
-      "tent_no": "B.03"
+      "tent_no": "B 03"
     },
     {
       "rank": 28,
-      "team": "Regu Anggrek (Putri)",
+      "team": "Cempaka",
       "scores": [
         100,
         90,
@@ -1793,7 +1793,7 @@
         0
       ],
       "total": 280,
-      "tent_no": "B.04"
+      "tent_no": "B 04"
     },
     {
       "scores": [
@@ -1823,14 +1823,14 @@
       ],
       "rank": 29,
       "total": 331,
-      "team": "Regu Tulip (Putri)",
-      "tent_no": "B.05"
+      "team": "Tulip",
+      "tent_no": "B 05"
     },
     {
       "total": 0,
-      "team": "Regu Sakura (Putri)",
+      "team": "(Kosong)",
       "rank": 30,
-      "tent_no": "B.06",
+      "tent_no": "B 06",
       "scores": [
         0,
         0,
@@ -1884,8 +1884,8 @@
         0
       ],
       "rank": 31,
-      "team": "Regu Teratai (Putri)",
-      "tent_no": "B.07",
+      "team": "Melati",
+      "tent_no": "B 07",
       "total": 0
     },
     {
@@ -1916,8 +1916,8 @@
       ],
       "total": 0,
       "rank": 32,
-      "team": "Regu Lavender (Putri)",
-      "tent_no": "B.08"
+      "team": "MATAHARI",
+      "tent_no": "B 08"
     },
     {
       "scores": [
@@ -1946,12 +1946,12 @@
         0
       ],
       "rank": 33,
-      "team": "Regu Lily (Putri)",
-      "tent_no": "B.09",
+      "team": "Melati",
+      "tent_no": "B 09",
       "total": 0
     },
     {
-      "team": "Regu Aster (Putri)",
+      "team": "Wijayakusuma",
       "rank": 34,
       "total": 0,
       "scores": [
@@ -1979,10 +1979,10 @@
         0,
         0
       ],
-      "tent_no": "B.10"
+      "tent_no": "B 10"
     },
     {
-      "team": "Regu Kenanga (Putri)",
+      "team": "EDELWEIS",
       "rank": 35,
       "scores": [
         0,
@@ -2010,10 +2010,10 @@
         0
       ],
       "total": 0,
-      "tent_no": "B.11"
+      "tent_no": "B 11"
     },
     {
-      "tent_no": "B.12",
+      "tent_no": "B 12",
       "total": 0,
       "scores": [
         0,
@@ -2041,7 +2041,7 @@
         0
       ],
       "rank": 36,
-      "team": "Regu Kamboja (Putri)"
+      "team": "FLAMBOYAN"
     },
     {
       "scores": [
@@ -2070,8 +2070,8 @@
         0
       ],
       "rank": 37,
-      "team": "Regu Bougenville (Putri)",
-      "tent_no": "B.13",
+      "team": "Matahari",
+      "tent_no": "B 13",
       "total": 0
     },
     {
@@ -2100,13 +2100,13 @@
         0,
         0
       ],
-      "team": "Regu Flamboyan (Putri)",
+      "team": "EDELWEIS",
       "rank": 38,
       "total": 0,
-      "tent_no": "B.14"
+      "tent_no": "B 14"
     },
     {
-      "team": "Regu Edelweis (Putri)",
+      "team": "Melati",
       "rank": 39,
       "total": 0,
       "scores": [
@@ -2134,7 +2134,7 @@
         0,
         0
       ],
-      "tent_no": "B.15"
+      "tent_no": "B 15"
     },
     {
       "scores": [
@@ -2162,15 +2162,15 @@
         0,
         0
       ],
-      "tent_no": "B.16",
+      "tent_no": "B 16",
       "total": 0,
-      "team": "Regu Matahari (Putri)",
+      "team": "TULIP",
       "rank": 40
     },
     {
       "rank": 41,
-      "team": "Regu Jasmine (Putri)",
-      "tent_no": "B.17",
+      "team": "(Kosong)",
+      "tent_no": "B 17",
       "scores": [
         0,
         0,
@@ -2200,9 +2200,9 @@
     },
     {
       "rank": 42,
-      "team": "Regu Orchid (Putri)",
+      "team": "MAWAR",
       "total": 0,
-      "tent_no": "B.18",
+      "tent_no": "B 18",
       "scores": [
         0,
         0,
@@ -2256,8 +2256,8 @@
         0
       ],
       "rank": 43,
-      "team": "Regu Camelia (Putri)",
-      "tent_no": "B.19",
+      "team": "DAHLIA",
+      "tent_no": "B 19",
       "total": 0
     },
     {
@@ -2287,15 +2287,15 @@
         0
       ],
       "total": 0,
-      "tent_no": "B.20",
+      "tent_no": "B 20",
       "rank": 44,
-      "team": "Regu Magnolia (Putri)"
+      "team": "(Kosong)"
     },
     {
-      "team": "Regu Dahlia Putih (Putri)",
+      "team": "MELATI",
       "total": 0,
       "rank": 45,
-      "tent_no": "B.21",
+      "tent_no": "B 21",
       "scores": [
         0,
         0,
@@ -2349,14 +2349,14 @@
         0
       ],
       "rank": 46,
-      "team": "Regu Sakura Merah (Putri)",
+      "team": "MAWAR",
       "total": 0,
-      "tent_no": "B.22"
+      "tent_no": "B 22"
     },
     {
       "total": 0,
       "rank": 47,
-      "team": "Regu Lily Putih (Putri)",
+      "team": "MELATI",
       "scores": [
         0,
         0,
@@ -2382,10 +2382,10 @@
         0,
         0
       ],
-      "tent_no": "B.23"
+      "tent_no": "B 23"
     },
     {
-      "tent_no": "B.24",
+      "tent_no": "B 24",
       "scores": [
         0,
         0,
@@ -2411,7 +2411,7 @@
         0,
         0
       ],
-      "team": "Regu Tulip Merah (Putri)",
+      "team": "MAWAR",
       "rank": 48,
       "total": 0
     }
@@ -2429,9 +2429,9 @@
   },
   "recap_smp": [
     {
-      "tent_no": "C.25",
+      "tent_no": "A 25",
       "total": 509,
-      "team": "Regu Scorpion (Putra)",
+      "team": "HARIMAU",
       "rank": 1,
       "scores": [
         88,
@@ -2471,8 +2471,8 @@
     {
       "total": 483,
       "rank": 2,
-      "team": "Regu Elang (Putra)",
-      "tent_no": "C.26",
+      "team": "Rajawali",
+      "tent_no": "A 26",
       "scores": [
         76,
         60,
@@ -2509,9 +2509,9 @@
       ]
     },
     {
-      "tent_no": "C.27",
+      "tent_no": "A 27",
       "total": 0,
-      "team": "Regu Rajawali (Putra)",
+      "team": "ELANG",
       "rank": 3,
       "scores": [
         0,
@@ -2549,9 +2549,9 @@
       ]
     },
     {
-      "tent_no": "C.28",
+      "tent_no": "A 28",
       "rank": 4,
-      "team": "Regu Harimau (Putra)",
+      "team": "Harimau",
       "scores": [
         0,
         0,
@@ -2623,15 +2623,15 @@
         0,
         0
       ],
-      "tent_no": "C.29",
+      "tent_no": "A 29",
       "rank": 5,
-      "team": "Regu Singa (Putra)",
+      "team": "RAJAWALI",
       "total": 0
     },
     {
-      "tent_no": "C.30",
+      "tent_no": "A 30",
       "total": 0,
-      "team": "Regu Beruang (Putra)",
+      "team": "GARUDA",
       "rank": 6,
       "scores": [
         0,
@@ -2704,12 +2704,12 @@
         0
       ],
       "rank": 7,
-      "team": "Regu Banteng (Putra)",
+      "team": "(Kosong)",
       "total": 0,
-      "tent_no": "C.31"
+      "tent_no": "A 31"
     },
     {
-      "tent_no": "C.32",
+      "tent_no": "A 32",
       "scores": [
         0,
         0,
@@ -2744,7 +2744,7 @@
         0,
         0
       ],
-      "team": "Regu Kobra (Putra)",
+      "team": "SINGA",
       "total": 0,
       "rank": 8
     },
@@ -2784,13 +2784,13 @@
         0,
         0
       ],
-      "tent_no": "D.25",
-      "team": "Regu Lily (Putri)",
+      "tent_no": "B 01",
+      "team": "MATAHARI",
       "rank": 9
     },
     {
       "rank": 10,
-      "team": "Regu Mawar (Putri)",
+      "team": "Matahari",
       "total": 150,
       "scores": [
         80,
@@ -2826,11 +2826,11 @@
         0,
         0
       ],
-      "tent_no": "D.26"
+      "tent_no": "B 02"
     },
     {
       "rank": 11,
-      "team": "Regu Dahlia (Putri)",
+      "team": "TERATAI",
       "scores": [
         0,
         0,
@@ -2866,11 +2866,11 @@
         0
       ],
       "total": 0,
-      "tent_no": "D.27"
+      "tent_no": "B 03"
     },
     {
       "total": 0,
-      "tent_no": "D.28",
+      "tent_no": "B 04",
       "scores": [
         0,
         0,
@@ -2906,7 +2906,7 @@
         0
       ],
       "rank": 12,
-      "team": "Regu Anggrek (Putri)"
+      "team": "Wijaya Kusuma"
     },
     {
       "scores": [
@@ -2944,15 +2944,15 @@
         0
       ],
       "total": 0,
-      "team": "Regu Tulip (Putri)",
-      "tent_no": "D.29",
+      "team": "MELATI",
+      "tent_no": "B 05",
       "rank": 13
     },
     {
       "total": 0,
-      "tent_no": "D.30",
+      "tent_no": "B 06",
       "rank": 14,
-      "team": "Regu Sakura (Putri)",
+      "team": "TULIP",
       "scores": [
         0,
         0,
@@ -2989,9 +2989,9 @@
       ]
     },
     {
-      "tent_no": "D.31",
+      "tent_no": "B 07",
       "total": 0,
-      "team": "Regu Teratai (Putri)",
+      "team": "(Kosong)",
       "rank": 15,
       "scores": [
         0,
@@ -3030,8 +3030,8 @@
     },
     {
       "total": 0,
-      "tent_no": "D.32",
-      "team": "Regu Lavender (Putri)",
+      "tent_no": "B 08",
+      "team": "MATAHARI",
       "rank": 16,
       "scores": [
         0,
