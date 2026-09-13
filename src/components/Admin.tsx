@@ -161,6 +161,7 @@ export default function Admin() {
   const [isUsingFirebase, setIsUsingFirebase] = useState(false);
   const [activeRecapTabSd, setActiveRecapTabSd] = useState<"putra" | "putri">("putra");
   const [activeRecapTabSmp, setActiveRecapTabSmp] = useState<"putra" | "putri">("putra");
+  const [showPasswordLogin, setShowPasswordLogin] = useState(false);
 
   const formatTentNo = (tent: string) => {
     if (!tent || typeof tent !== "string") return tent;
@@ -816,39 +817,55 @@ export default function Admin() {
             Google Login (lt2jatinagara@gmail.com)
           </button>
 
-          <div className="relative flex py-2 items-center mb-6">
-            <div className="flex-grow border-t border-brand-border"></div>
-            <span className="flex-shrink mx-4 text-[10px] font-black text-brand-muted uppercase tracking-widest">Atau Masuk Password</span>
-            <div className="flex-grow border-t border-brand-border"></div>
-          </div>
+          {showPasswordLogin && (
+            <div className="relative flex py-2 items-center mb-6">
+              <div className="flex-grow border-t border-brand-border"></div>
+              <span className="flex-shrink mx-4 text-[10px] font-black text-brand-muted uppercase tracking-widest">Atau Masuk Password</span>
+              <div className="flex-grow border-t border-brand-border"></div>
+            </div>
+          )}
 
-          <form id="admin-password-login-form" onSubmit={(e) => {
-            e.preventDefault();
-            if (password === "admin123" || password === "admin" || password.trim() !== "") {
-              setPassword("admin123");
-              setIsLoggedIn(true);
-              setMessage("Login berhasil dengan Password Admin!");
-              loadFromFirestore();
-            } else {
-              setMessage("❌ Password salah! (Default: admin123)");
-            }
-          }} className="space-y-4">
+          <form
+            id="admin-password-login-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (password === "admin123" || password === "admin" || password.trim() !== "") {
+                setPassword("admin123");
+                setIsLoggedIn(true);
+                setMessage("Login berhasil dengan Password Admin!");
+                loadFromFirestore();
+              } else {
+                setMessage("❌ Password salah!");
+              }
+            }}
+            className={showPasswordLogin ? "space-y-4" : "hidden"}
+          >
             <input
               id="admin-password-input"
               type="password"
-              placeholder="Masukkan Password Admin (admin123)"
+              placeholder="Masukkan Password Admin"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 rounded-2xl border border-brand-border text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className={showPasswordLogin ? "w-full p-4 rounded-2xl border border-brand-border text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary" : "hidden"}
             />
             <button
               id="admin-password-submit-btn"
               type="submit"
-              className="w-full bg-slate-900 text-white font-black p-4 rounded-2xl hover:bg-slate-800 transition-all uppercase tracking-widest text-[11px] active:scale-95 shadow-md"
+              className={showPasswordLogin ? "w-full bg-slate-900 text-white font-black p-4 rounded-2xl hover:bg-slate-800 transition-all uppercase tracking-widest text-[11px] active:scale-95 shadow-md" : "hidden"}
             >
               Masuk Dengan Password
             </button>
           </form>
+
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => setShowPasswordLogin(!showPasswordLogin)}
+              className="text-[10px] font-bold text-brand-muted/60 hover:text-brand-muted transition-colors uppercase tracking-wider"
+            >
+              {showPasswordLogin ? "✕ Sembunyikan Opsi Password" : "Opsi Masuk Alternatif"}
+            </button>
+          </div>
 
           {/* Vercel Connection Guidelines */}
           <div className="mt-8 text-left bg-slate-50 border border-brand-border rounded-3xl p-5">
