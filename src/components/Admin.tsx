@@ -228,7 +228,7 @@ export default function Admin() {
       { team: "GARUDA", tent_no: "A 03" },
       { team: "Kancil", tent_no: "A 04" },
       { team: "Banteng", tent_no: "A 05" },
-      { team: "(Kosong)", tent_no: "A 06" },
+      { team: "MACAN", tent_no: "A 06" },
       { team: "Banteng", tent_no: "A 07" },
       { team: "KOBRA", tent_no: "A 08" },
       { team: "BANTENG", tent_no: "A 09" },
@@ -256,7 +256,7 @@ export default function Admin() {
       { team: "SAKURA", tent_no: "B 03" },
       { team: "Cempaka", tent_no: "B 04" },
       { team: "Tulip", tent_no: "B 05" },
-      { team: "(Kosong)", tent_no: "B 06" },
+      { team: "DAISY", tent_no: "B 06" },
       { team: "Melati", tent_no: "B 07" },
       { team: "MATAHARI", tent_no: "B 08" },
       { team: "Melati", tent_no: "B 09" },
@@ -370,7 +370,7 @@ export default function Admin() {
       { team: "Harimau", tent_no: "A 28" },
       { team: "RAJAWALI", tent_no: "A 29" },
       { team: "GARUDA", tent_no: "A 30" },
-      { team: "(Kosong)", tent_no: "A 31" },
+      { team: "RAJAWALI", tent_no: "A 31" },
       { team: "SINGA", tent_no: "A 32" }
     ];
 
@@ -381,7 +381,7 @@ export default function Admin() {
       { team: "Wijaya Kusuma", tent_no: "B 04" },
       { team: "MELATI", tent_no: "B 05" },
       { team: "TULIP", tent_no: "B 06" },
-      { team: "(Kosong)", tent_no: "B 07" },
+      { team: "EDELWEISH", tent_no: "B 07" },
       { team: "MATAHARI", tent_no: "B 08" }
     ];
 
