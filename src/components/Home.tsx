@@ -92,7 +92,6 @@ const DEFAULT_SMP_COMPETITIONS = [
   "Folksong",
   "Seni R",
   "Karnafal",
-  "Bakiak",
   "Lari B"
 ];
 
@@ -265,7 +264,7 @@ export default function Home() {
     return DEFAULT_SD_COMPETITIONS[i] || (i + 1 < 10 ? `L-0${i + 1}` : `L-${i + 1}`);
   });
 
-  const compNamesSmp: string[] = Array.from({ length: 32 }).map((_, i) => {
+  const compNamesSmp: string[] = Array.from({ length: 31 }).map((_, i) => {
     if (rawCompSmp && rawCompSmp[i]) return rawCompSmp[i];
     return DEFAULT_SMP_COMPETITIONS[i] || (i + 1 < 10 ? `L-0${i + 1}` : `L-${i + 1}`);
   });
@@ -473,7 +472,7 @@ export default function Home() {
   };
 
   // Ensure exactly 16 teams are returned for SMP/MTs (8 Putra and 8 Putri)
-  const ensure32Teams = (recapList: any[], numScores = 32): any[] => {
+  const ensure32Teams = (recapList: any[], numScores = 31): any[] => {
     const list = recapList || [];
     const defaultPutra = [
       { team: "HARIMAU", tent_no: "A 25" },
@@ -592,7 +591,7 @@ export default function Home() {
     )
     .sort((a, b) => getTentNum(a.tent_no) - getTentNum(b.tent_no));
 
-  const recapSmp = ensure32Teams(rawRecapSmp || (siteData as any).recap, 32);
+  const recapSmp = ensure32Teams(rawRecapSmp || (siteData as any).recap, 31);
   const recapSmpPutra = recapSmp
     .filter((item: any) => 
       item.team.toLowerCase().includes("putra") || 
@@ -1277,7 +1276,7 @@ export default function Home() {
               </table>
             </div>
             <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">32 Mata Lomba sesuai Petunjuk Teknis LT-II.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">31 Mata Lomba sesuai Petunjuk Teknis LT-II.</p>
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
             </div>
           </div>
@@ -1346,7 +1345,7 @@ export default function Home() {
               </table>
             </div>
             <div className="p-8 border-t border-brand-border bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">32 Mata Lomba sesuai Petunjuk Teknis LT-II.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">31 Mata Lomba sesuai Petunjuk Teknis LT-II.</p>
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-muted italic">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
             </div>
           </div>

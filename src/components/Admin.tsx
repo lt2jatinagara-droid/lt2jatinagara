@@ -69,7 +69,6 @@ const DEFAULT_SMP_COMPETITIONS = [
   "Folksong",
   "Seni R",
   "Karnafal",
-  "Bakiak",
   "Lari B"
 ];
 
@@ -361,7 +360,7 @@ export default function Admin() {
     });
   };
 
-  const ensure32Teams = (recapList: any[], numScores = 32): any[] => {
+  const ensure32Teams = (recapList: any[], numScores = 31): any[] => {
     const list = recapList || [];
     const defaultPutra = [
       { team: "HARIMAU", tent_no: "A 25" },
@@ -510,9 +509,9 @@ export default function Admin() {
       slides: newData.slides && newData.slides.length > 0 ? newData.slides : ref.slides,
       schedule: sanitizedSchedule,
       news: newData.news && newData.news.length > 0 ? newData.news : ref.news,
-      recap: ensure32Teams(newData.recap || ref.recap, 32),
+      recap: ensure32Teams(newData.recap || ref.recap, 31),
       recap_sd: ensure64TeamsForSd(newData.recap_sd || ref.recap_sd || newData.recap || ref.recap, 23),
-      recap_smp: ensure32Teams(newData.recap_smp || ref.recap_smp || newData.recap || ref.recap, 32),
+      recap_smp: ensure32Teams(newData.recap_smp || ref.recap_smp || newData.recap || ref.recap, 31),
       competition_names_sd: newData.competition_names_sd || ref.competition_names_sd || DEFAULT_SD_COMPETITIONS,
       competition_names_smp: newData.competition_names_smp || ref.competition_names_smp || DEFAULT_SMP_COMPETITIONS,
       documents: newData.documents && newData.documents.length > 0 ? newData.documents : ref.documents
@@ -1224,7 +1223,7 @@ export default function Admin() {
                   <th className="sticky top-0 left-0 bg-white z-50 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center w-[48px] border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)]">No</th>
                   <th className="sticky top-0 left-[48px] bg-white z-50 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted border-r border-brand-border/20 border-b-2 border-brand-border/20 shadow-[4px_2px_8px_-2px_rgba(0,0,0,0.1)] min-w-[180px]">Nama Regu</th>
                   <th className="sticky top-0 bg-white z-40 py-4 px-4 text-[10px] font-black uppercase tracking-widest text-brand-muted border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap">No Tenda</th>
-                  {Array.from({ length: 32 }).map((_, i) => {
+                  {Array.from({ length: 31 }).map((_, i) => {
                     const cName = data?.competition_names_smp?.[i] || DEFAULT_SMP_COMPETITIONS[i] || (i + 1 < 10 ? `L-0${i + 1}` : `L-${i + 1}`);
                     return (
                       <th key={i} className="sticky top-0 bg-white z-40 py-4 px-2 text-[10px] font-black uppercase tracking-widest text-brand-muted text-center border-b-2 border-brand-border/20 shadow-[0_2px_4px_rgba(0,0,0,0.04)] whitespace-nowrap min-w-[70px]" title={`Lomba ${i + 1}: ${cName}`}>
@@ -1295,14 +1294,14 @@ export default function Admin() {
                             }}
                           />
                         </td>
-                        {Array.from({ length: 32 }).map((_, sIdx) => (
+                        {Array.from({ length: 31 }).map((_, sIdx) => (
                           <td key={sIdx} className="py-2 px-1 border-b border-brand-border/10">
                             <ScoreInput
                               value={item.scores[sIdx]}
                               onChange={(val) => {
                                 const newRecap = data.recap_smp.map((t: any, tIdx: number) => {
                                   if (tIdx !== i) return t;
-                                  const scores = Array.isArray(t.scores) ? [...t.scores] : Array(32).fill(0);
+                                  const scores = Array.isArray(t.scores) ? [...t.scores] : Array(31).fill(0);
                                   scores[sIdx] = val;
                                   const sum = scores.reduce((a: number, b: number) => a + (Number(b) || 0), 0);
                                   const total = Math.round(sum * 100) / 100;
@@ -1365,7 +1364,7 @@ export default function Admin() {
                   rank: data.recap_smp.length + 1, 
                   team: prefixName, 
                   tent_no: prefixCargo, 
-                  scores: Array(32).fill(0),
+                  scores: Array(31).fill(0),
                   total: 0 
                 }] 
               });
