@@ -164,17 +164,22 @@ export default function Admin() {
 
   const formatTentNo = (tent: string) => {
     if (!tent || typeof tent !== "string") return tent;
-    if (tent.toUpperCase().startsWith("PI-")) {
-      return "B " + tent.slice(3);
+    const clean = tent.trim().toUpperCase();
+    if (clean.startsWith("PA-") || clean.startsWith("A.") || clean.startsWith("A-") || clean.startsWith("A ")) {
+      const m = clean.match(/\d+/);
+      if (m) {
+        const num = parseInt(m[0], 10);
+        return `A.${num < 10 ? '0' + num : num}`;
+      }
+      return "A.01";
     }
-    if (tent.toUpperCase().startsWith("B.")) {
-      return "B " + tent.slice(2);
-    }
-    if (tent.toUpperCase().startsWith("PA-")) {
-      return "A " + tent.slice(3);
-    }
-    if (tent.toUpperCase().startsWith("A.")) {
-      return "A " + tent.slice(2);
+    if (clean.startsWith("PI-") || clean.startsWith("B.") || clean.startsWith("B-") || clean.startsWith("B ")) {
+      const m = clean.match(/\d+/);
+      if (m) {
+        const num = parseInt(m[0], 10);
+        return `B.${num < 10 ? '0' + num : num}`;
+      }
+      return "B.01";
     }
     return tent;
   };
@@ -187,26 +192,26 @@ export default function Admin() {
       if (m) {
         const num = parseInt(m[0], 10);
         if (num >= 25 && num <= 32) {
-          return `A ${num}`;
+          return `C.${num}`;
         }
         if (num >= 1 && num <= 8) {
-          return `A ${24 + num}`;
+          return `C.${24 + num}`;
         }
       }
-      return "A 25";
+      return "C.25";
     }
     if (clean.startsWith("PI-") || clean.startsWith("B.") || clean.startsWith("B-") || clean.startsWith("B ") || clean.startsWith("D.") || clean.startsWith("D-") || clean.startsWith("D ")) {
       const m = clean.match(/\d+/);
       if (m) {
         const num = parseInt(m[0], 10);
-        if (num >= 1 && num <= 8) {
-          return `B 0${num}`;
-        }
         if (num >= 25 && num <= 32) {
-          return `B 0${num - 24}`;
+          return `D.${num}`;
+        }
+        if (num >= 1 && num <= 8) {
+          return `D.${24 + num}`;
         }
       }
-      return "B 01";
+      return "D.25";
     }
     return tent;
   };
@@ -363,43 +368,68 @@ export default function Admin() {
   const ensure32Teams = (recapList: any[], numScores = 31): any[] => {
     const list = recapList || [];
     const defaultPutra = [
-      { team: "HARIMAU", tent_no: "A 25" },
-      { team: "Rajawali", tent_no: "A 26" },
-      { team: "ELANG", tent_no: "A 27" },
-      { team: "Harimau", tent_no: "A 28" },
-      { team: "RAJAWALI", tent_no: "A 29" },
-      { team: "GARUDA", tent_no: "A 30" },
-      { team: "RAJAWALI", tent_no: "A 31" },
-      { team: "SINGA", tent_no: "A 32" }
+      { team: "HARIMAU", tent_no: "C.25" },
+      { team: "Rajawali", tent_no: "C.26" },
+      { team: "ELANG", tent_no: "C.27" },
+      { team: "Harimau", tent_no: "C.28" },
+      { team: "RAJAWALI", tent_no: "C.29" },
+      { team: "GARUDA", tent_no: "C.30" },
+      { team: "RAJAWALI", tent_no: "C.31" },
+      { team: "SINGA", tent_no: "C.32" }
     ];
 
     const defaultPutri = [
-      { team: "MATAHARI", tent_no: "B 01" },
-      { team: "Matahari", tent_no: "B 02" },
-      { team: "TERATAI", tent_no: "B 03" },
-      { team: "Wijaya Kusuma", tent_no: "B 04" },
-      { team: "MELATI", tent_no: "B 05" },
-      { team: "TULIP", tent_no: "B 06" },
-      { team: "EDELWEISH", tent_no: "B 07" },
-      { team: "MATAHARI", tent_no: "B 08" }
+      { team: "MATAHARI", tent_no: "D.25" },
+      { team: "Matahari", tent_no: "D.26" },
+      { team: "TERATAI", tent_no: "D.27" },
+      { team: "Wijaya Kusuma", tent_no: "D.28" },
+      { team: "MELATI", tent_no: "D.29" },
+      { team: "TULIP", tent_no: "D.30" },
+      { team: "EDELWEISH", tent_no: "D.31" },
+      { team: "MATAHARI", tent_no: "D.32" }
     ];
 
     const incomingPutra = list.filter((item: any) => 
-      item && item.team && (item.team.toLowerCase().includes("putra") || 
-      (item.tent_no && (item.tent_no.toUpperCase().startsWith("C.") || item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A"))))
+      item && (
+        (item.tent_no && (
+          item.tent_no.toUpperCase().startsWith("C.") || 
+          item.tent_no.toUpperCase().startsWith("C ") || 
+          item.tent_no.toUpperCase().startsWith("C-") || 
+          item.tent_no.toUpperCase().startsWith("PA") || 
+          item.tent_no.toUpperCase().startsWith("A")
+        )) ||
+        (item.team && item.team.toLowerCase().includes("putra"))
+      )
     );
 
     const incomingPutri = list.filter((item: any) => 
-      item && item.team && (item.team.toLowerCase().includes("putri") || 
-      (item.tent_no && (item.tent_no.toUpperCase().startsWith("D.") || item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B"))))
+      item && (
+        (item.tent_no && (
+          item.tent_no.toUpperCase().startsWith("D.") || 
+          item.tent_no.toUpperCase().startsWith("D ") || 
+          item.tent_no.toUpperCase().startsWith("D-") || 
+          item.tent_no.toUpperCase().startsWith("PI") || 
+          item.tent_no.toUpperCase().startsWith("B")
+        )) ||
+        (item.team && item.team.toLowerCase().includes("putri"))
+      )
     );
 
     const incomingOthers = list.filter((item: any) => 
-      item && item.team && 
-      !item.team.toLowerCase().includes("putra") && 
-      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("C.") || item.tent_no.toUpperCase().startsWith("PA") || item.tent_no.toUpperCase().startsWith("A"))) &&
-      !item.team.toLowerCase().includes("putri") && 
-      !(item.tent_no && (item.tent_no.toUpperCase().startsWith("D.") || item.tent_no.toUpperCase().startsWith("PI") || item.tent_no.toUpperCase().startsWith("B")))
+      item && 
+      !(item.tent_no && (
+        item.tent_no.toUpperCase().startsWith("C.") || 
+        item.tent_no.toUpperCase().startsWith("C ") || 
+        item.tent_no.toUpperCase().startsWith("C-") || 
+        item.tent_no.toUpperCase().startsWith("PA") || 
+        item.tent_no.toUpperCase().startsWith("A") ||
+        item.tent_no.toUpperCase().startsWith("D.") || 
+        item.tent_no.toUpperCase().startsWith("D ") || 
+        item.tent_no.toUpperCase().startsWith("D-") || 
+        item.tent_no.toUpperCase().startsWith("PI") || 
+        item.tent_no.toUpperCase().startsWith("B")
+      )) &&
+      !(item.team && (item.team.toLowerCase().includes("putra") || item.team.toLowerCase().includes("putri")))
     );
 
     const putraResult = [...incomingPutra];
@@ -407,7 +437,7 @@ export default function Admin() {
       const idx = putraResult.length;
       const nextDefault = defaultPutra.find(d => !putraResult.some(p => formatTentNoSmp(p.tent_no) === d.tent_no)) 
         || defaultPutra[idx] 
-        || { team: `Putra ${idx + 1}`, tent_no: `A ${25 + idx}` };
+        || { team: `Putra ${idx + 1}`, tent_no: `C.${25 + idx}` };
       
       putraResult.push({
         rank: idx + 1,
@@ -423,7 +453,7 @@ export default function Admin() {
       const idx = putriResult.length;
       const nextDefault = defaultPutri.find(d => !putriResult.some(p => formatTentNoSmp(p.tent_no) === d.tent_no)) 
         || defaultPutri[idx] 
-        || { team: `Putri ${idx + 1}`, tent_no: `B 0${idx + 1}` };
+        || { team: `Putri ${idx + 1}`, tent_no: `D.${25 + idx}` };
 
       putriResult.push({
         rank: idx + 1,
@@ -502,6 +532,21 @@ export default function Admin() {
       return { ...item, date: d };
     });
 
+    const mergeRecapLists = (incomingList: any[], refList: any[]) => {
+      if (!incomingList || !Array.isArray(incomingList) || incomingList.length === 0) return refList;
+      if (!refList || !Array.isArray(refList) || refList.length === 0) return incomingList;
+      return refList.map((refItem: any, idx: number) => {
+        const incItem = incomingList[idx] || incomingList.find((x: any) => x.tent_no === refItem.tent_no);
+        if (!incItem) return refItem;
+        const refHasScores = (refItem.scores || []).some((s: number) => Number(s) > 0) || Number(refItem.total) > 0;
+        const incHasScores = (incItem.scores || []).some((s: number) => Number(s) > 0) || Number(incItem.total) > 0;
+        if (refHasScores && !incHasScores) {
+          return refItem;
+        }
+        return incItem;
+      });
+    };
+
     const merged = {
       ...ref,
       ...newData,
@@ -510,8 +555,8 @@ export default function Admin() {
       schedule: sanitizedSchedule,
       news: newData.news && newData.news.length > 0 ? newData.news : ref.news,
       recap: ensure32Teams(newData.recap || ref.recap, 31),
-      recap_sd: ensure64TeamsForSd(newData.recap_sd || ref.recap_sd || newData.recap || ref.recap, 23),
-      recap_smp: ensure32Teams(newData.recap_smp || ref.recap_smp || newData.recap || ref.recap, 31),
+      recap_sd: ensure64TeamsForSd(mergeRecapLists(newData.recap_sd, ref.recap_sd || rawFallbackData.recap_sd), 23),
+      recap_smp: ensure32Teams(mergeRecapLists(newData.recap_smp, ref.recap_smp || rawFallbackData.recap_smp), 31),
       competition_names_sd: newData.competition_names_sd || ref.competition_names_sd || DEFAULT_SD_COMPETITIONS,
       competition_names_smp: newData.competition_names_smp || ref.competition_names_smp || DEFAULT_SMP_COMPETITIONS,
       documents: newData.documents && newData.documents.length > 0 ? newData.documents : ref.documents
